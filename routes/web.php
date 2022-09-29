@@ -29,7 +29,7 @@ Route::post('auth/custom-registration', [LoginController::class, 'customRegistra
 Route::get('auth/logout', [LoginController::class, 'logOut'])->name('logout');
 
 //display search view -> action search (post)---------------------------------------------------------------------------
-Route::get('teams/searchTeam', [TeamsController::class, 'searchTeam'])->name('team.searchTeam');
+Route::get('teams/searchTeam', [TeamsController::class, 'searchTeam'])->name('team.searchTeam')->middleware('check.admin');
 Route::get('teams/search', [TeamsController::class, 'search'])->name('team.search');
 
 //display create view -> take in data and display confirm view (post) -> create team (get)

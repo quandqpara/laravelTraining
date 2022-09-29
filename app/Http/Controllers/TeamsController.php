@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Auth;
 class TeamsController extends Controller
 {
     public function searchTeam(){
-        var_dump(Auth::check());
-        die;
         if(Auth::check()){
             return view('teams/searchTeam');
         }

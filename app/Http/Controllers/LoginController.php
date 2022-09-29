@@ -23,9 +23,9 @@ class LoginController extends Controller
     public function login(LoginRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
 
-        $credentials = $request->only('email','password');var_dump($credentials); die;
+        $credentials = $request->only('email','password');
         if (Auth::attempt($credentials)){
-
+            session()->put('admin',true);
             return redirect()->intended('teams/searchTeam')->with('success','Logged in!');
         }
 
@@ -43,7 +43,14 @@ class LoginController extends Controller
         $data = $request->all();
         $check = $this->create($data);
 
-        return redirect("teams/searchTeam")->with('success', 'You have signed-in');
+        $credentials = $request->only('email','password');
+        if(Auth::attempt($credentials))
+        {
+            session()->put('admin', true);
+            return redirect()->intended('teams/searchTeam')->with('success','You have signed-in!');
+        }
+
+        return redirect("auth")->with('success', 'Failed to create new account!');
     }
 
     public function create(array $data)
@@ -59,6 +66,6 @@ class LoginController extends Controller
         Session::flush();
         Auth::logout();
 
-        return Redirect('auth/index');
+        return Redirect('auth');
     }
 }

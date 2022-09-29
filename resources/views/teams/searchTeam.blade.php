@@ -4,6 +4,11 @@
 
 @section('content')
     <div class="h-100 w-100 flex-column mb-auto admin-home-sect">
+        @if(session()->has('success'))
+            <div class="alert alert-success d-flex justify-content-center">
+                <span>  {{ session()->get('success') }} </span>
+            </div>
+        @endif
         <div class="mt-3 mb-3 search-box border border-dark">
             <form method="GET" action="{{ route('team.search') }}" class=" m-4 form-create">
                 <!-- Name input -->
@@ -55,20 +60,9 @@
                                 ID
                             </a>
                         </th>
-                        <th scope="col">Avatar</th>
                         <th class="thread-column" scope="col" >
                             <a href="">
                                 Name
-                            </a>
-                        </th>
-                        <th class="thread-column" scope="col" >
-                            <a href="">
-                                Email
-                            </a>
-                        </th>
-                        <th class="thread-column" scope="col" >
-                            <a href="">
-                                Role
                             </a>
                         </th>
                         <th scope="col">Action</th>
@@ -81,4 +75,10 @@
             </div>
         </div>
     </div>
+    @php
+        $data = session()->all();
+        echo '<pre>';
+        var_dump($data);
+        echo '</pre>';
+    @endphp
 @endsection
