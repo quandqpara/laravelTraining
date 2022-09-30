@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name', 128);
+            $table->string('name', 128)->unique();
             $table->integer('ins_id');
             $table->integer('upd_id')->nullable();
             $table->dateTime('ins_datetime', 0 );

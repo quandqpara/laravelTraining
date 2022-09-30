@@ -1,20 +1,38 @@
 @extends('app')
-@section('title', 'Search Team')
+@section('title', 'Create Team')
 @include('components.hnav')
 
 @section('content')
     <div class="content-container">
-        <form class="the-form" method="POST" action="/team/createTeam">
+        @if(session()->has('message'))
+            <div class="alert alert-danger">
+                {{ session()->get('message') }}
+            </div>
+        @endif
+        <form class="the-form" method="POST" action="{{route('team.createConfirm')}}">
+            @csrf
             <div class="form-box">
-                <div class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <label for="inputPassword6" class="col-form-label">Password</label>
+                <div class="row g-2 align-items-center">
+                    <div class="col-4">
+                        <label for="name" class="col-form-label">Team Name:</label>
                     </div>
-                    <div class="col-auto">
-                        <input type="password" id="inputPassword6" class="form-control"
-                               aria-describedby="passwordHelpInline">
+                    <div class="col-8">
+                        <input type="text" id="name" name="name" class="form-control"
+                        @if(old('name') !== null)
+                            value="@php echo old('name'); @endphp"
+                        @endif
+                        >
                     </div>
-                    <span  class="form-text message {{isset($_SESSION['message']['name']) ? '' : 'hide'}}"><small>{{isset($_SESSION['message']['name']) ? handleMessage('name') : ''}}</small></span>
+                        @if($errors->has('name'))
+                        <div class="col-4"></div>
+                        <div class="col-8">
+                             <span class="err-span no-mg-top">
+                                @error('name')
+                                 {{ $message }}
+                                 @enderror
+                            </span>
+                        </div>
+                        @endif
                 </div>
             </div>
             <div class="col-auto submit-box d-flex justify-content-between">
@@ -22,6 +40,17 @@
                 <button type="submit" class="btn btn-primary"> Confirm</button>
             </div>
         </form>
+        <script>
+            function resetInput() {
+                window.location.href = "/teams/createTeam";
+            }
+        </script>
     </div>
-    <?php var_dump($_SESSION); ?>
+
+    @php
+        $data = session()->all();
+        echo '<pre>';
+        var_dump($data);
+        echo '</pre>';
+    @endphp
 @endsection

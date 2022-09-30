@@ -13,6 +13,10 @@ class LoginRequest extends FormRequest
      */
     public function authorize()
     {
+        if (!session()->has('admin')) {
+            return redirect('auth')->with('success', 'You are not allow to access this page.');
+            return false;
+        }
         return true;
     }
 

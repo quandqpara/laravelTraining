@@ -3,9 +3,9 @@
 @include('components.hnav')
 @section('content')
     <div class="d-flex flex-column align-items-center justify-content-center section-container" style="height: 90vh">
-        @if(session()->has('message'))
+        @if(session()->has('success'))
             <div class="alert alert-danger">
-                {{ session()->get('message') }}
+                {{ session()->get('success') }}
             </div>
         @endif
         <div class="login-container">
@@ -21,7 +21,7 @@
                            value="{{old('email')}}"
                            required
                     />
-                    @if($errors->any())
+                    @if($errors->has('email'))
                         <span class="alert alert-danger">
                         @error('email')
                             {{ $message }}
@@ -35,11 +35,11 @@
                 <div class="d-flex flex-column form-outline mt-2">
                     <label class="form-label" for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-control" required/>
-                    @if($errors->any())
-                    <span class="alert alert-danger">
+                    @if($errors->has('password'))
+                        <span class="alert alert-danger">
                         @error('password')
-                        {{ $message }}
-                        @enderror
+                            {{ $message }}
+                            @enderror
                     </span>
                     @endif
                 </div>
@@ -51,10 +51,4 @@
             </form>
         </div>
     </div>
-    @php
-        $data = session()->all();
-        echo '<pre>';
-        var_dump($data);
-        echo '</pre>';
-    @endphp
 @endsection
