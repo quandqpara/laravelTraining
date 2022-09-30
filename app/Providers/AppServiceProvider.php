@@ -13,7 +13,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(
+            \App\Repositories\Teams\TeamsRepositoryInterface::class,
+            \App\Repositories\Teams\TeamsRepository::class,
+        );
+        $this->app->singleton(
+            \App\Repositories\Employees\EmployeesRepositoryInterface::class,
+            \App\Repositories\Employees\EmloyeesRepository::class,
+        );
     }
 
     /**
