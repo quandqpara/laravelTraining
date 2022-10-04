@@ -1,7 +1,10 @@
 <?php
 
+<<<<<<< HEAD
 namespace App\Repositories;
 
+=======
+>>>>>>> origin/master
 abstract class BaseRepository implements RepositoryInterface
 {
     //target model to interact with
@@ -37,7 +40,11 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find($id)
     {
+<<<<<<< HEAD
         return $this->model->where([['id','=',$id],['del_flag','=',0]])->get();
+=======
+        return $this->model->find($id);
+>>>>>>> origin/master
     }
 
     /**
@@ -50,6 +57,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+<<<<<<< HEAD
      * Update function
      * Find the tar get then Update record
      * @param array $attributes
@@ -59,6 +67,20 @@ abstract class BaseRepository implements RepositoryInterface
     public function update(array $attributes, $id){
         $target = $this->model->findOrFail($id);
         return $target->update($attributes);
+=======
+     * Update record
+     * @param $id
+     * @param $attributes
+     * @return false|mixed
+     */
+    public function update($id, $attributes = []){
+        $result = $this->find($id);
+        if ($result) {
+            $result->update($attributes);
+            return $result;
+        }
+        return false;
+>>>>>>> origin/master
     }
 
     /**
@@ -68,7 +90,15 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function delete($id){
         $attributes = ['del_flag'=>1];
+<<<<<<< HEAD
         return $this->update($attributes, $id);
+=======
+        $result =  $this->update($id, $attributes);
+        if($result !== false){
+            return true;
+        }
+        return false;
+>>>>>>> origin/master
     }
 
 }
