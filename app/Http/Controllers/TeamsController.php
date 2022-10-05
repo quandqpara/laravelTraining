@@ -30,88 +30,12 @@ class TeamsController extends Controller
         $this->teamsRepo = $teamsRepo;
     }
 
-    public function includeTime($data)
-    {
-        $dataReturn = array_merge($data, [
-            'ins_id' => 1,
-            'ins_datetime' => date('Y-m-d H:i:s')]);
-        return $dataReturn;
-    }
-
-    /**
-     * handling sorting direction logic -> This must be run before column handle
-     * @param $data
-     * @return string|void return either ASC | DESC based on cases
-     */
-    private function handleDirection($data){
-        //if selecting a new column to sort
-        if(isset($data['column']) && $data['column'] !== Session::get('column'))
-        {
-            Session::put('direction', 1);
-            return $this->getDirection(1);
-        }
-
-        //if column selected is the same as previous or column is not selected/newly selected
-        //if request not contain direction -> set session direction = 1 and direction to query = 1
-        if(!isset($data['direction'])){
-            Session::put('direction', 1);
-            return $this->getDirection(1);
-        }
-
-        if(!session()->has('direction') && isset($data['direction'])){
-            Session::put('direction', $data['direction']);
-            return $this->getDirection($data['direction']);
-        }
-
-        //if request contain direction and request direct !== session direction
-        // -> set session direction = request direction
-        // -> set direction to query = request direction
-        if($data['direction'] !== Session::get('direction'))
-        {
-            Session::put('direction', $data['direction']);
-            return $this->getDirection($data['direction']);
-        }
-
-        //if request contain direction and request direct == session direction
-        // -> set session direction = request direction
-        // -> set direction to query = request direction
-        if($data['direction'] == Session::get('direction'))
-        {
-            $queryDirection = (int)$data['direction'] * -1;
-
-            Session::put('direction', $queryDirection);
-            return $this->getDirection($queryDirection);
-        }
-    }
-
-    /**
-     * handling sorting column logic
-     * @param $data
-     * @return string
-     */
-    private function handleColumn($data){
-        if(!isset($data['column'])){
-            Session::put('column', 'id');
-            return 'id';
-        }
-
-        Session::put('column', $data['column']);
-        return $data['column'];
-    }
-
-    private function getDirection($direction){
-        return ($direction == 1) ? 'ASC' : 'DESC';
-    }
-
-    private function reverseGetDirection($direction)
-    {
-        return ($direction == 'ASC') ? 1 : -1;
-    }
-
     //------------------------------------------------------------VIEWS-------------------------------------------------
     public function searchTeam()
     {
-        return view('teams/searchTeam');
+        $name = "";
+        $teams = $this->teamsRepo->findByName($name);
+        return view('teams/searchTeam')->with('teams', $teams);
     }
 
     public function createTeam()
@@ -123,6 +47,9 @@ class TeamsController extends Controller
     {
         $name = $request->get('name');
         $request->flash();
+        if($this->teamsRepo->targetExist($name) > 0){
+            return redirect('teams/createTeam')->with('message', 'Team already exist!');
+        }
         return view('teams/createTeamConfirm')->with('name', $name);
     }
 
@@ -155,8 +82,9 @@ class TeamsController extends Controller
     public function store(CreateTeamRequest $request)
     {
         $data = $request->all();
-        $data = $this->includeTime($data);
+        $data = $this->teamsRepo->includeTime($data);
 
+        //1
         try {
             $this->teamsRepo->create($data);
         } catch (QueryException $e) {
@@ -167,6 +95,7 @@ class TeamsController extends Controller
             }
         }
 
+        //2
         if (!$this->teamsRepo->isExist($data['name'])) {
             $request->flash();
             Session::flash('message', 'Failed to create team!');
@@ -174,8 +103,8 @@ class TeamsController extends Controller
         }
 
         $message = 'Team ' . $data['name'] . ' has been created!';
-        Session::flash('message', $message);
-        return view('teams/searchTeam');
+        Session::flash('success', $message);
+        return $this->searchTeam();
     }
 
     /**
@@ -188,6 +117,7 @@ class TeamsController extends Controller
     public function update(EditTeamRequest $request)
     {
         $data = $request->all();
+        $data = $this->teamsRepo->includeTime($data);
         $id = $data['id'];
         try {
             $result = $this->teamsRepo->update($data, $id);
@@ -206,7 +136,7 @@ class TeamsController extends Controller
         }
 
         Session::flash('success', 'Team ID:' . $id . ' has been edited!');
-        return view('teams/searchTeam');
+        return $this->searchTeam();
     }
 
     /**
@@ -214,14 +144,13 @@ class TeamsController extends Controller
      * @return Application|Factory|View
      * basically an array of result from TEAMS table
      */
-    public function index(SearchTeamRequest $request)
+    public function index(Request $request, $column, $direction)
     {
         $name = $request->get('name');
+        $teams = $this->teamsRepo->findByName($name, $column, $direction);
 
-        $teams = $this->teamsRepo->findByName(request()->get('name'));
-        dd($teams);
         $request->flash();
-        return view('teams.searchTeam', ['teams' => $teams]);
+        return view('teams.searchTeam', ['teams' => $teams, 'column' => $column, 'direction' => $direction]);
     }
 
     /**
@@ -240,14 +169,6 @@ class TeamsController extends Controller
         }
 
         Session::flash('success', 'Team ' . $name . ' has been deleted!');
-        return view('teams/searchTeam');
+        return $this->searchTeam();
     }
-
-    private function setSortingInfo($request){
-        if(!$request->has('column') && !$request->has('direction')){
-            return ['column'=>'id', 'direction' => 'ASC'];
-        }
-    }
-
-
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories\Teams;
+
 use App\Repositories\Baserepository;
 
 class TeamsRepository extends BaseRepository implements TeamsRepositoryInterface
@@ -23,7 +24,7 @@ class TeamsRepository extends BaseRepository implements TeamsRepositoryInterface
     public function isExist(string $name)
     {
         $target = $this->findByName($name)->toArray();
-        if(empty($target)){
+        if (empty($target)) {
             return false;
         }
         return true;
@@ -32,20 +33,23 @@ class TeamsRepository extends BaseRepository implements TeamsRepositoryInterface
     /**
      * find LIKE %name% where del_flag = 0
      * @param $name
+     * @param string $column
+     * @param string $direction
      * @return void
      */
-    public function findByName($name, $column, $direction)
+    public function findByName($name, $column = 'id', $direction = 'asc')
     {
-        $sortField = request()->get('sortField', 'id');
-        $sortType = request()->get('sortType', 'desc');
-
         return $result = $this->model->select('id', 'name')
-            ->where([   ['name','LIKE','%'.$name.'%'],
-                        ['del_flag', '=', 0]            ])
-            ->when(!empty(request('name')), function($q) {
-                $q->where('name','LIKE','%'.request('name') .'%');
+            ->where([['name', 'LIKE', '%' . $name . '%'],
+                ['del_flag', '=', 0]])
+            ->when(!empty(request('name')), function ($q) {
+                $q->where('name', 'LIKE', '%' . request('name') . '%');
             })
-            ->orderBy($sortField, $sortType)
+            ->when(str_contains(request('name'), '%'), function ($q) {
+                $namePhrase = str_replace('%', '\%', request('name'));
+                $q->where('name', 'LIKE', '%' . $namePhrase . '%');
+            })
+            ->orderBy($column, $direction)
             ->paginate(3)
             ->withQueryString();
     }

@@ -1,10 +1,9 @@
 <?php
 
-<<<<<<< HEAD
 namespace App\Repositories;
 
-=======
->>>>>>> origin/master
+use Illuminate\Support\Facades\DB;
+
 abstract class BaseRepository implements RepositoryInterface
 {
     //target model to interact with
@@ -29,7 +28,8 @@ abstract class BaseRepository implements RepositoryInterface
      * Find all records
      * @return mixed
      */
-    public function getAll(){
+    public function getAll()
+    {
         return $this->model->all();
     }
 
@@ -40,11 +40,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find($id)
     {
-<<<<<<< HEAD
-        return $this->model->where([['id','=',$id],['del_flag','=',0]])->get();
-=======
-        return $this->model->find($id);
->>>>>>> origin/master
+        return $this->model->where([['id', '=', $id], ['del_flag', '=', 0]])->get();
     }
 
     /**
@@ -52,53 +48,54 @@ abstract class BaseRepository implements RepositoryInterface
      * @param $attributes
      * @return mixed
      */
-    public function create($attributes =[]){
+    public function create($attributes = [])
+    {
         return $this->model->create($attributes);
     }
 
     /**
-<<<<<<< HEAD
      * Update function
      * Find the tar get then Update record
      * @param array $attributes
      * @param $id
      * @return false|mixed
      */
-    public function update(array $attributes, $id){
+    public function update(array $attributes, $id)
+    {
         $target = $this->model->findOrFail($id);
         return $target->update($attributes);
-=======
-     * Update record
-     * @param $id
-     * @param $attributes
-     * @return false|mixed
-     */
-    public function update($id, $attributes = []){
-        $result = $this->find($id);
-        if ($result) {
-            $result->update($attributes);
-            return $result;
-        }
-        return false;
->>>>>>> origin/master
     }
+
 
     /**
      * Delete(soft) record by reuse Update with del_flag = 1
      * @param $id
      * @return bool
      */
-    public function delete($id){
-        $attributes = ['del_flag'=>1];
-<<<<<<< HEAD
-        return $this->update($attributes, $id);
-=======
-        $result =  $this->update($id, $attributes);
-        if($result !== false){
+    public function delete($id)
+    {
+        $attributes = ['del_flag' => 1];
+        $result = $this->update($id, $attributes);
+        if ($result !== false) {
             return true;
         }
         return false;
->>>>>>> origin/master
     }
 
+    public function includeTime($data)
+    {
+        return array_merge($data, [
+            'ins_id' => 1,
+            'ins_datetime' => date('Y-m-d H:i:s')]);
+    }
+
+    public function getTeamList(){
+        $teams = DB::table('teams')->select('id', 'name')->where('del_flag', '=', 0)->get();
+        return $teams->toArray();
+    }
+
+
+    public function targetExist($name){
+        return $this->teamsRepo->findByName($name)->count();
+    }
 }

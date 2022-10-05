@@ -30,7 +30,7 @@ Route::get('auth/logout', [LoginController::class, 'logOut'])->name('logout');
 
 //display search view -> action search (post)---------------------------------------------------------------------------
 Route::get('teams/searchTeam', [TeamsController::class, 'searchTeam'])->name('team.searchTeam')->middleware('check.admin');
-Route::get('teams/search', [TeamsController::class, 'index'])->name('team.search')->middleware('check.admin');;
+Route::get('teams/search/{column}/{direction}', [TeamsController::class, 'index'])->name('team.search')->middleware('check.admin');;
 
 //display create view -> take in data and display confirm view (post) -> create team (get)
 Route::get('teams/createTeam', [TeamsController::class, 'createTeam'])->name('team.createTeam')->middleware('check.admin');;
@@ -38,16 +38,16 @@ Route::post('teams/createConfirm', [TeamsController::class, 'createTeamConfirm']
 Route::post('teams/create', [TeamsController::class, 'store'])->name('team.create')->middleware('check.admin');;
 
 //display edit view -> take in data and display confirm view (post) -> edit team (post)
-Route::get('teams/editTeam/{id}', [TeamsController::class, 'editTeam'])->where('id','[0-9]+')->name('team.editTeam')->middleware('check.admin');;
+Route::get('teams/editTeam/{id}', [TeamsController::class, 'editTeam'])->where('id', '[0-9]+')->name('team.editTeam')->middleware('check.admin');;
 Route::post('teams/editConfirm', [TeamsController::class, 'editTeamConfirm'])->name('team.editConfirm')->middleware('check.admin');;
 Route::post('teams/edit/', [TeamsController::class, 'update'])->name('team.edit')->middleware('check.admin');;
 
 //delete team
-Route::get('teams/deleteTeam/{id}', [TeamsController::class, 'destroy'])->where('id','[0-9]+')->name('team.delete')->middleware('check.admin');
+Route::get('teams/deleteTeam/{id}', [TeamsController::class, 'destroy'])->where('id', '[0-9]+')->name('team.delete')->middleware('check.admin');
 
 //display search view -> action search (post)---------------------------------------------------------------------------
 Route::get('employees/searchEmployee', [employeesController::class, 'searchEmployee'])->name('employee.searchEmployee')->middleware('check.admin');;
-Route::get('employees/search', [employeesController::class, 'search'])->name('employee.search')->middleware('check.admin');;
+Route::get('employees/search/{column}/{direction}', [employeesController::class, 'search'])->name('employee.search')->middleware('check.admin');;
 
 //display create view -> take in data and display confirm view (post) -> create employee (get)
 Route::get('employees/createEmployee', [employeesController::class, 'createEmployee'])->name('employee.createEmployee')->middleware('check.admin');;

@@ -18,12 +18,12 @@
                     </div>
                     <div class="col-8">
                         <input type="text" id="name" name="name" class="form-control"
-                        @if(old('name') !== null)
-                            value="@php echo old('name'); @endphp"
-                        @endif
+                               @if(old('name') !== null)
+                                   value="{{ old('name') }}"
+                            @endif
                         >
                     </div>
-                        @if($errors->has('name'))
+                    @if($errors->has('name'))
                         <div class="col-4"></div>
                         <div class="col-8">
                              <span class="err-span no-mg-top">
@@ -32,7 +32,7 @@
                                  @enderror
                             </span>
                         </div>
-                        @endif
+                    @endif
                 </div>
             </div>
             <div class="col-auto submit-box d-flex justify-content-between">
@@ -42,15 +42,9 @@
         </form>
         <script>
             function resetInput() {
-                window.location.href = "/teams/createTeam";
+                const url = window.location.href;
+                window.location.href = url;
             }
         </script>
     </div>
-
-    @php
-        $data = session()->all();
-        echo '<pre>';
-        var_dump($data);
-        echo '</pre>';
-    @endphp
 @endsection

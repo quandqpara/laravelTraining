@@ -40,11 +40,4 @@
             }
         </script>
     </div>
-
-    @php
-       $data = session()->all();
-       echo '<pre>';
-       var_dump($data);
-       echo '</pre>';
-    @endphp
 @endsection

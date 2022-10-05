@@ -21,7 +21,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item  {{ request()->is('employees/search') ? 'active' : '' }}" href="{{ route('employee.searchEmployee') }}">Search</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item  {{ request()->is('employees/create') ? 'active' : '' }}" href="{{ route('employee.searchEmployee') }}">Create</a>
+                        <a class="dropdown-item  {{ request()->is('employees/create') ? 'active' : '' }}" href="{{ route('employee.createEmployee') }}">Create</a>
                     </div>
                 </li>
                 @guest
