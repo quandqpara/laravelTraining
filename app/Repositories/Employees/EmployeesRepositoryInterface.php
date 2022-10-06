@@ -6,7 +6,7 @@ interface EmployeesRepositoryInterface
 {
     public function isExist(string $name);
 
-    public function findByName(string $name, $column, $direction);
+    public function findEmployee(array $data, $column, $direction);
 
     public function getName($id);
 }

@@ -12,7 +12,7 @@
         <form class="the-form" method="POST" action="{{route('team.createConfirm')}}">
             @csrf
             <div class="form-box">
-                <div class="row g-2 align-items-center">
+                <div class="create-row row g-2 align-items-center">
                     <div class="col-4">
                         <label for="name" class="col-form-label">Team Name:</label>
                     </div>

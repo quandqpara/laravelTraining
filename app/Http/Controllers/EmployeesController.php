@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateEmployeeRequest;
 use App\Repositories\Employees\EmloyeesRepository;
 use App\Repositories\Employees\EmployeesRepositoryInterface;
 use Illuminate\Contracts\Foundation\Application;
@@ -9,6 +10,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class EmployeesController extends Controller
 {
@@ -22,13 +24,14 @@ class EmployeesController extends Controller
     public function __construct(EmployeesRepositoryInterface $employeesRepo)
     {
         $this->employeesRepo = $employeesRepo;
-        $this->positionList = [['id'=>'Manager', 'name'=>'Manager'], ['id'=>'Team lead','name'=>'Team lead'], ['id'=>'BSE','name'=>'BSE'], ['id'=>'DEV','name'=>'DEV'], ['id'=>'Tester','name'=>'Tester']];
-        $this->typeOfWork = [['id'=>'Full time', 'name'=>'Full time'], ['id'=>'Part time','name'=>'Part time'], ['id'=>'Probationary Staff','name'=>'Probationary Staff'], ['id'=>'Intern','name'=>'Intern']];
+        $this->positionList = [['id' => 1, 'name' => 'Manager'], ['id' => 2, 'name' => 'Team lead'], ['id' => 3, 'name' => 'BSE'], ['id' => 4, 'name' => 'DEV'], ['id' => 5, 'name' => 'Tester']];
+        $this->typeOfWork = [['id' => 1, 'name' => 'Full time'], ['id' => 2, 'name' => 'Part time'], ['id' => 3, 'name' => 'Probationary Staff'], ['id' => 4, 'name' => 'Intern']];
     }
 
     //-------------------------------------------VIEWS------------------------------------------------------------------
     public function searchEmployee()
     {
+        $employees = $this->employeesRepo->findAll();
         $teams = $this->employeesRepo->getTeamList();
         return view('employees/searchEmployee', ['teams' => $teams]);
     }
@@ -36,13 +39,23 @@ class EmployeesController extends Controller
     public function createEmployee()
     {
         $teams = $this->employeesRepo->getTeamList();
-        return view('employees/createEmployee', ['teams'=>$teams, 'positionList'=>$this->positionList, 'typeOfWork' => $this->typeOfWork]);
+        return view('employees/createEmployee', ['teams' => $teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
-    public function createEmployeeConfirm()
+    public function createEmployeeConfirm(CreateEmployeeRequest $request)
     {
+        $data = $request->all();
+
+        $email = $request->get('email');
+
+        if ($this->employeesRepo->targetExist($email, 'email', 'employees') > 0) {
+            return redirect('employees/createEmployee')->with('message', 'Employee already exist!');
+        }
+
         $teams = $this->employeesRepo->getTeamList();
-        return view('employees/createEmployeeConfirm', ['teams'=>$teams, 'positionList'=>$this->positionList, 'typeOfWork' => $this->typeOfWork]);
+        //tempImgUrl
+
+        return view('employees/createEmployeeConfirm', ['employeeData' => $data, 'teams' => $teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
     //--------------------------------------------CRUD------------------------------------------------------------------
@@ -56,12 +69,23 @@ class EmployeesController extends Controller
     {
         $data = $request->all();
 
-        //viet form request
+        $temp = $data['avatar'];
+        $avatar = str_replace('temp/temp_', 'auth/',$temp);
 
-        $employee = $this->employeesRepo->create($data);
-        //check this output.
+        $data['avatar'] = $avatar;
 
-        return view('employees.search');
+        $this->employeesRepo->create($data);
+
+        if(!$this->employeesRepo->isExist($data['email'])) {
+            $request->flash();
+            Session::flash('message', 'Failed to create employee!');
+            return redirect('teams/createTeam');
+        }
+
+        $message = 'Employee ' . $data['first_name'] . ' has been created!';
+        Session::flash('success', $message);
+        session()->forget('tempImgUrl');
+        return $this->searchEmployee();
     }
 
     /**

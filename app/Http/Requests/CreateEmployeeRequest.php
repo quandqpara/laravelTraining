@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateEmployeeRequest extends FormRequest
@@ -9,13 +10,14 @@ class CreateEmployeeRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
-     * @return bool
+     * @return mixed
      */
     public function authorize()
     {
+        handleAvatar();
+
         if (!session()->has('admin')) {
             return redirect('auth')->with('success', 'You are not allow to access this page.');
-            return false;
         }
         return true;
     }
@@ -28,18 +30,18 @@ class CreateEmployeeRequest extends FormRequest
     public function rules()
     {
         return [
-            'avatar'=>'required|mimes:jpeg,jpg,png,gif|max:100000|size:2048',
+            'avatar'=>'required|image|mimes:jpeg,jpg,png,gif|max:2048',
             'team_id'=>'required|integer|max_digits:11',
-            'email'=>'required|email:filter|unique',
+            'email'=>'required|email:filter|unique:employees,email',
             'first_name'=>'required|string|min:2',
             'last_name'=>'required|string|min:2',
-            'password'=>'required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed',
+            'password'=>'required|min:8|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,60}$/',
             'gender'=>'required',
             'birthday'=>'required|date',
             'address'=>'required|string',
             'salary'=>'required|integer',
-            'position' => 'required|string|in:Manager, Team lead, BSE, DEV, Tester',
-            'type_of_work'=> 'required|string|in:Full time, Part time, Probationary Staff, Intern',
+            'position' => 'required',
+            'type_of_work'=> 'required',
             'status' => 'required'
         ];
     }

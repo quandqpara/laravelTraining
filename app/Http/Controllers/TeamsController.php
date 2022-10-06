@@ -47,7 +47,7 @@ class TeamsController extends Controller
     {
         $name = $request->get('name');
         $request->flash();
-        if($this->teamsRepo->targetExist($name) > 0){
+        if($this->teamsRepo->targetExist($name,'name','teams') > 0){
             return redirect('teams/createTeam')->with('message', 'Team already exist!');
         }
         return view('teams/createTeamConfirm')->with('name', $name);
@@ -103,6 +103,7 @@ class TeamsController extends Controller
         }
 
         $message = 'Team ' . $data['name'] . ' has been created!';
+        unset($request);
         Session::flash('success', $message);
         return $this->searchTeam();
     }

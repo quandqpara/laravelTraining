@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -139,11 +140,19 @@ function setDropdown(array $data, $dropDownId, $dropDownName){
     }
 
     else {
+
         $oldSelectionName = '';
         foreach($data as $key){
-            if ($key->id == request()->get($dropDownName)){
-                $oldSelectionName = $key->name;
+            if(!is_array($key)) {
+                if ($key->id == request()->get($dropDownName)) {
+                    $oldSelectionName = $key->name;
+                }
+            } else {
+                if ($key['id'] == request()->get($dropDownName)) {
+                    $oldSelectionName = $key['name'];
+                }
             }
+
         }
 
         echo '<select id="'.$dropDownId. '" name="'.$dropDownName.'">';
@@ -161,7 +170,71 @@ function setDropdown(array $data, $dropDownId, $dropDownName){
 }
 
 function isChecked($field, $value){
-    if(old($field) == $value){
+    if(request()->get($field) == $value){
         return 'checked';
+    }
+}
+
+function handleAvatar(){
+    $imageName = null;
+    $imageUrl = null;
+
+    if(request()->hasFile('avatar')) {
+        $image = request()->file(('avatar'));
+        $imageName = 'temp_'.time().'_'.$image->getClientOriginalName();
+        $image->storeAs('public/temp/', $imageName);
+        $imageUrl = 'storage/temp/'.$imageName;
+        session()->put('tempImgUrl', $imageUrl);
+    } else {
+        $imageName = str_replace('storage/temp/','', session()->get('tempImgUrl'));
+        $imageUrl = session()->get('tempImgUrl');
+    }
+
+    request()->merge([
+        'avatar_name' => $imageName,
+        'avatar_url' => $imageUrl,
+    ]);
+
+}
+
+/**
+ * @throws ContainerExceptionInterface
+ * @throws NotFoundExceptionInterface
+ */
+function displayImage(){
+    return session()->get('tempImgUrl') ?? '/default/avatar/default-user-avatar.png';
+}
+
+function displayPassword($password){
+    return str_repeat('*', strlen($password));
+}
+
+function displayTeamName($teamId, $teamsList){
+    foreach ($teamsList as $key){
+        if($key->id == $teamId){
+            return $key->name;
+        }
+    }
+}
+
+function displayDropDownInput($id, $listValue){
+    foreach ($listValue as $key){
+        if($key['id'] == $id){
+            return $key['name'];
+        }
+    }
+}
+
+function displayRadioInput($field, $value){
+    if($field == 'gender'){
+        if($value == 1){
+            return 'Male';
+        }
+        return 'Female';
+    } elseif ($field == 'status'){
+        if($value == 1){
+            return 'On working';
+        }
+        return 'Retired';
     }
 }

@@ -20,7 +20,9 @@
                     </div>
                     <div class="col-6">
                         <input type="file" id="avatar" name="avatar" class="form-control"
-                               accept="image/png, image/jpg, image/jpeg, image/svg, image/svg"/>
+                               accept="image/png, image/jpg, image/jpeg, image/svg, image/svg"
+                               value="{{old('avatar_url'??'')}}"
+                        />
                     </div>
                     @if($errors->has('avatar'))
                         <div class="col-2"></div>
@@ -36,7 +38,7 @@
                 <div class="row g-2 align-items-center mt-0.5">
                     <div class="col-2"></div>
                     <div class="col-6 avatar-display border-round">
-                        <img src="/uploads/avatar/default-user-avatar.png">
+                        <img src="{{asset(displayImage())}}">
                     </div>
                 </div>
 
@@ -138,11 +140,7 @@
                         <label for="password" class="col-form-label">Password*</label>
                     </div>
                     <div class="col-6">
-                        <input type="password" id="password" name="password" class="form-control"
-                               @if(old('password') !== null)
-                                   value="{{ old('password') }}"
-                            @endif
-                        >
+                        <input type="password" id="password" name="password" class="form-control">
                     </div>
                     @if($errors->has('password'))
                         <div class="col-2"></div>

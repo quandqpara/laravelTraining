@@ -130,7 +130,6 @@
         </div>
     </div>
     @php
-        dump($teams);
         dump(session()->all());
         dump(request()->all());
         @endphp

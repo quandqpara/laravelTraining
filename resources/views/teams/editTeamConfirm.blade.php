@@ -5,7 +5,7 @@
 @section('content')
     <div class="content-container">
         @if(isset($data))
-            <div class="alert alert-primary d-flex justify-content-center">
+            <div class="confirm-action-notify alert alert-primary d-flex justify-content-center">
                 Do you want to confirm to edit team {{$data['id']}} with this information?
             </div>
             <form class="the-form" method="POST" action="{{route('team.edit')}}">

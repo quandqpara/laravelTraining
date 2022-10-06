@@ -3,6 +3,7 @@
 namespace App\Repositories\Employees;
 
 use App\Repositories\Baserepository;
+use Illuminate\Support\Facades\DB;
 
 class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryInterface
 {
@@ -14,21 +15,26 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
      * @param string $direction
      * @return void
      */
-    public function findByName($name, $column = 'id', $direction = 'asc')
+    public function findEmployee($data, $column = 'id', $direction = 'asc')
     {
+        $teamID = $data['team_id'];
+        $name = $data['name'];
+        $email = $data['email'];
+
         return $result = $this->model->select('id', 'name')
-            ->where([['name', 'LIKE', '%' . $name . '%'],
+            ->where([
+                ['team_id','LIKE', '%'.$teamID.'%'],
+                ['email', 'LIKE', '%' . $email . '%'],
                 ['del_flag', '=', 0]])
-            ->when(!empty(request('name')), function ($q) {
-                $q->where('name', 'LIKE', '%' . request('name') . '%');
-            })
-            ->when(str_contains(request('name'), '%'), function ($q) {
-                $namePhrase = str_replace('%', '\%', request('name'));
-                $q->where('name', 'LIKE', '%' . $namePhrase . '%');
-            })
+            ->when()
             ->orderBy($column, $direction)
             ->paginate(3)
             ->withQueryString();
+    }
+
+    public function findAll(){
+        return $this->model->select('id', 'avatar', 'team_id', 'first_name', 'last_name', 'email')
+            ->where('del_flag','=', 0)->get();
     }
 
     public function getModel()
@@ -36,9 +42,13 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
         return \App\Models\Employees::class;
     }
 
-    public function isExist(string $name)
+    public function isExist(string $email)
     {
-        // TODO: Implement isExist() method.
+        $isExist = DB::table('employees')->where('email', '=', $email )->count();
+        if($isExist > 0){
+            return true;
+        }
+        return false;
     }
 
     public function getName($id)

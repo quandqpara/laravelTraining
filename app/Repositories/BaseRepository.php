@@ -50,6 +50,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function create($attributes = [])
     {
+        $attributes = $this->includeTime($attributes);
         return $this->model->create($attributes);
     }
 
@@ -63,6 +64,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function update(array $attributes, $id)
     {
         $target = $this->model->findOrFail($id);
+        $attributes = $this->includeTime($attributes);
         return $target->update($attributes);
     }
 
@@ -75,6 +77,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function delete($id)
     {
         $attributes = ['del_flag' => 1];
+        $attributes = $this->includeTime($attributes);
         $result = $this->update($id, $attributes);
         if ($result !== false) {
             return true;
@@ -94,8 +97,7 @@ abstract class BaseRepository implements RepositoryInterface
         return $teams->toArray();
     }
 
-
-    public function targetExist($name){
-        return $this->teamsRepo->findByName($name)->count();
+    public function targetExist($value, $field, $table){
+        return DB::table($table)->where($field, '=', $value)->count();
     }
 }
