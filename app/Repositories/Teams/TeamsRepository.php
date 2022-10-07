@@ -39,18 +39,12 @@ class TeamsRepository extends BaseRepository implements TeamsRepositoryInterface
      */
     public function findByName($name, $column = 'id', $direction = 'asc')
     {
-        return $result = $this->model->select('id', 'name')
+        return $this->model->select('id', 'name')
             ->where([['name', 'LIKE', '%' . $name . '%'],
-                ['del_flag', '=', 0]])
-            ->when(!empty(request('name')), function ($q) {
-                $q->where('name', 'LIKE', '%' . request('name') . '%');
-            })
-            ->when(str_contains(request('name'), '%'), function ($q) {
-                $namePhrase = str_replace('%', '\%', request('name'));
-                $q->where('name', 'LIKE', '%' . $namePhrase . '%');
-            })
+                ['del_flag', '=', config('global.DEL_FLAG_OFF')]])
+
             ->orderBy($column, $direction)
-            ->paginate(3)
+            ->paginate(config('global.PAGE_LIMIT'))
             ->withQueryString();
     }
 

@@ -46,7 +46,7 @@
 
                 <!-- Submit button -->
                 <div class="d-flex flex-column form-outline align-items-center justify-content-center mt-4">
-                    <button type="submit" class="btn btn-primary btn-block mb-4 btn-submit" style="max-width: 50%">Sign in</button>
+                    <button type="submit" class="btn btn-primary btn-block mb-4 btn-submit" style="max-width: 50%">Log in</button>
                 </div>
             </form>
         </div>

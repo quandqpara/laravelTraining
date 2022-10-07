@@ -81,10 +81,12 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {{displayTableResult($teams)}}
+                    {{displayTableResult($teams, 'teams')}}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    @php dump(request()->all() ?? 'nothing');@endphp
 @endsection

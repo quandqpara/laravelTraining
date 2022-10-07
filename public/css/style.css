@@ -138,3 +138,10 @@ img {
     max-width: 100px;
     object-fit: cover;
 }
+
+.notice-message{
+    min-width: 650px;
+    max-width: 40%;
+    margin: 0 auto;
+    text-align: center;
+}

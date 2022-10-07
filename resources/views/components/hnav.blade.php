@@ -8,9 +8,9 @@
                         <span>Team management</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item  {{ request()->is('teams/search') ? 'active' : '' }}" href="{{ route('team.searchTeam') }}">Search</a>
+                        <a class="dropdown-item  {{ request()->is('teams/searchTeam') ? 'active' : '' }}" href="{{ route('team.searchTeam') }}">Search</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item  {{ request()->is('teams/create') ? 'active' : '' }}" href="{{ route('team.createTeam') }}">Create</a>
+                        <a class="dropdown-item  {{ request()->is('teams/createTeam') ? 'active' : '' }}" href="{{ route('team.createTeam') }}">Create</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -19,9 +19,9 @@
                         <span>Employees management</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item  {{ request()->is('employees/search') ? 'active' : '' }}" href="{{ route('employee.searchEmployee') }}">Search</a>
+                        <a class="dropdown-item  {{ request()->is('employees/searchEmployee') ? 'active' : '' }}" href="{{ route('employee.searchEmployee') }}">Search</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item  {{ request()->is('employees/create') ? 'active' : '' }}" href="{{ route('employee.createEmployee') }}">Create</a>
+                        <a class="dropdown-item  {{ request()->is('employees/createEmployee') ? 'active' : '' }}" href="{{ route('employee.createEmployee') }}">Create</a>
                     </div>
                 </li>
                 @guest

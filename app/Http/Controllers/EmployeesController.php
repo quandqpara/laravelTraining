@@ -8,6 +8,7 @@ use App\Repositories\Employees\EmployeesRepositoryInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -20,10 +21,12 @@ class EmployeesController extends Controller
     protected EmloyeesRepository|EmployeesRepositoryInterface $employeesRepo;
     protected $positionList;
     protected $typeOfWork;
+    protected $teams;
 
     public function __construct(EmployeesRepositoryInterface $employeesRepo)
     {
         $this->employeesRepo = $employeesRepo;
+        $this->teams = $this->employeesRepo->getTeamList();
         $this->positionList = [['id' => 1, 'name' => 'Manager'], ['id' => 2, 'name' => 'Team lead'], ['id' => 3, 'name' => 'BSE'], ['id' => 4, 'name' => 'DEV'], ['id' => 5, 'name' => 'Tester']];
         $this->typeOfWork = [['id' => 1, 'name' => 'Full time'], ['id' => 2, 'name' => 'Part time'], ['id' => 3, 'name' => 'Probationary Staff'], ['id' => 4, 'name' => 'Intern']];
     }
@@ -32,14 +35,13 @@ class EmployeesController extends Controller
     public function searchEmployee()
     {
         $employees = $this->employeesRepo->findAll();
-        $teams = $this->employeesRepo->getTeamList();
-        return view('employees/searchEmployee', ['teams' => $teams]);
+
+        return view('employees/searchEmployee', ['teams' => $this->teams, 'employees' => $employees]);
     }
 
     public function createEmployee()
     {
-        $teams = $this->employeesRepo->getTeamList();
-        return view('employees/createEmployee', ['teams' => $teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
+        return view('employees/createEmployee', ['teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
     public function createEmployeeConfirm(CreateEmployeeRequest $request)
@@ -52,15 +54,21 @@ class EmployeesController extends Controller
             return redirect('employees/createEmployee')->with('message', 'Employee already exist!');
         }
 
-        $teams = $this->employeesRepo->getTeamList();
-        //tempImgUrl
+        return view('employees/createEmployeeConfirm', ['employeeData' => $data, 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
+    }
 
-        return view('employees/createEmployeeConfirm', ['employeeData' => $data, 'teams' => $teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
+    public function editEmployee(int $id){
+        $find = $this->employeesRepo->find($id);
+        $target = $find->toArray();
+        return view('employees/editEmployee',['target'=>$target['0'], 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
     //--------------------------------------------CRUD------------------------------------------------------------------
 
     /**
+     * get $data from request -> get 2 path of avatar (temp, auth) -> create
+     * -> create failed -> redirect to create Page
+     * -> create success ->
      * Create function
      * @param Request $request data from input
      * @return Application|Factory|View
@@ -70,22 +78,24 @@ class EmployeesController extends Controller
         $data = $request->all();
 
         $temp = $data['avatar'];
-        $avatar = str_replace('temp/temp_', 'auth/',$temp);
-
+        $avatar = str_replace('temp/temp_', 'auth/', $temp);
         $data['avatar'] = $avatar;
 
         $this->employeesRepo->create($data);
 
-        if(!$this->employeesRepo->isExist($data['email'])) {
+        if (!$this->employeesRepo->isExist($data['email'])) {
             $request->flash();
             Session::flash('message', 'Failed to create employee!');
-            return redirect('teams/createTeam');
+            return redirect('employees/createEmployee');
         }
 
-        $message = 'Employee ' . $data['first_name'] . ' has been created!';
+        $message = 'Employee ' . $data['last_name'] .' '. $data['first_name'] . ' has been created!';
         Session::flash('success', $message);
+        rename($temp, $avatar);
         session()->forget('tempImgUrl');
-        return $this->searchEmployee();
+        $teams = $this->employeesRepo->getTeamList();
+        $employees = $this->employeesRepo->findAll();
+        return view('employees.searchEmployee', ['teams' => $teams, 'employees' => $employees]);
     }
 
     /**
@@ -111,11 +121,16 @@ class EmployeesController extends Controller
      * @return Application|Factory|View
      * basically an array of result from employeeS table
      */
-    public function index()
+    public function index(Request $request)
     {
-        $employees = $this->employeesRepo->getAll();
-        //check this output
-        return view('employees.search', ['employees' => $employees]);
+        $column = $request->get('column');
+        $direction = $request->get('direction');
+
+        $employees = $this->employeesRepo->findEmployee($column, $direction);
+        $teams = $this->employeesRepo->getTeamList();
+
+        $request->flash();
+        return view('employees.searchEmployee', ['employees' => $employees, 'teams' => $teams, 'column' => $column, 'direction' => $direction]);
     }
 
     /**

@@ -50,7 +50,7 @@ Route::get('teams/deleteTeam/{id}', [TeamsController::class, 'destroy'])->where(
 //--EMPLOYEE------------------------------------------------------------------------------------------------------------
 //display SEARCH view -> action search (post)---------------------------------------------------------------------------
 Route::get('employees/searchEmployee', [employeesController::class, 'searchEmployee'])->name('employee.searchEmployee')->middleware('check.admin');;
-Route::get('employees/search/{column}/{direction}', [employeesController::class, 'search'])->name('employee.search')->middleware('check.admin');;
+Route::get('employees/search', [employeesController::class, 'index'])->name('employee.search')->middleware('check.admin');;
 
 //display CREATE view -> take in data and display confirm view (post) -> create employee (get)
 Route::get('employees/createEmployee', [employeesController::class, 'createEmployee'])->name('employee.createEmployee')->middleware('check.admin');;
@@ -58,6 +58,6 @@ Route::post('employees/createConfirm', [employeesController::class, 'createEmplo
 Route::post('employees/create', [employeesController::class, 'store'])->name('employee.create')->middleware('check.admin');;
 
 //display EDIT view -> take in data and display confirm view (post) -> edit employee (get)
-Route::get('employees/editEmployee', [employeesController::class, 'editEmployee'])->name('employee.editEmployee')->middleware('check.admin');;
-Route::post('employees/edit', [employeesController::class, 'editConfirm'])->name('employee.editConfirm')->middleware('check.admin');;
-Route::post('employees/edit/{confirm}', [employeesController::class, 'edit'])->name('employee.edit')->middleware('check.admin');;
+Route::get('employees/editEmployee/{id}', [employeesController::class, 'editEmployee'])->where('id', '[0-9]+')->name('employee.editEmployee')->middleware('check.admin');;
+Route::post('employees/editConfirm', [employeesController::class, 'editConfirm'])->name('employee.editConfirm')->middleware('check.admin');;
+Route::post('employees/edit', [employeesController::class, 'update'])->name('employee.edit')->middleware('check.admin');;

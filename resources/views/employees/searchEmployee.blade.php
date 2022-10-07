@@ -3,11 +3,10 @@
 @include('components.hnav')
 
 @section('content')
-
     <div class="h-100 w-100 flex-column mb-auto admin-home-sect">
         {{displayNotification()}}
         <div class="mt-3 mb-3 search-box border border-dark">
-            <form method="GET" action="{{route('employee.searchEmployee')}}" class="search-form-box m-4 form-create">
+            <form method="GET" action="{{route('employee.search', ['team_id'=>'', 'name'=>'', 'email'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}" class="search-form-box m-4 form-create">
                 <div class="input-form-box">
                     <!-- team_id input -->
                     <div class="row g-2 align-items-center mb-3 mt-3">
@@ -98,39 +97,49 @@
                 }
             </script>
         </div>
+
         <div class="d-flex flex-column result-container mb-2 mt-2 p-3 border border-dark">
-{{--            @if(isset($teams))--}}
-{{--                <div>--}}
-{{--                    {!! $teams->links("pagination::bootstrap-5") !!}--}}
-{{--                </div>--}}
-{{--            @endif--}}
+            @if(isset($employees))
+                <div>
+                    {!! $employees->links("pagination::bootstrap-5") !!}
+                </div>
+            @endif
             <div class="table-cover border border-dark">
                 <table id="searchTable"
                        class="result-table table table-sortable table-striped table-bordered table-hover">
                     <thead class="thead-dark">
                     <tr>
                         <th class="thread-column" scope="col">
-                            {{--                            <a href="{{setSortHrefTeam('id',$column??'id',$direction??'asc')}}">--}}
+                            <a href="{{setSortHrefEmployee('id',$column??'id',$direction??'asc')}}">
                             ID
-                            {{--                            </a>--}}
+                            </a>
                         </th>
                         <th class="thread-column" scope="col">
-                            {{--                            <a href="{{setSortHrefTeam('name',$column??'id',$direction??'asc')}}">--}}
+                            Avatar
+                        </th>
+                        <th class="thread-column" scope="col">
+                            <a href="{{setSortHrefEmployee('team_id',$column??'id',$direction??'asc')}}">
+                                Team
+                            </a>
+                        </th>
+                        <th class="thread-column" scope="col">
+                            <a href="{{setSortHrefEmployee('name',$column??'id',$direction??'asc')}}">
                             Name
-                            {{--                            </a>--}}
+                            </a>
+                        </th>
+                        <th class="thread-column" scope="col">
+                            <a href="{{setSortHrefEmployee('email',$column??'id',$direction??'asc')}}">
+                            Email
+                            </a>
                         </th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {{--                    {{displayTableResult($teams)}}--}}
+                        {{displayTableResult($employees, 'employees', $teams)}}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    @php
-        dump(session()->all());
-        dump(request()->all());
-        @endphp
 @endsection

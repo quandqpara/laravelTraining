@@ -63,9 +63,9 @@ class LoginController extends Controller
     }
 
     public function logOut() {
+        rmdir('storage/temp');
         Session::flush();
         Auth::logout();
-
         return Redirect('auth');
     }
 }

@@ -39,7 +39,7 @@ class CreateEmployeeRequest extends FormRequest
             'gender'=>'required',
             'birthday'=>'required|date',
             'address'=>'required|string',
-            'salary'=>'required|integer',
+            'salary'=>'required|integer|max: 100000000',
             'position' => 'required',
             'type_of_work'=> 'required',
             'status' => 'required'

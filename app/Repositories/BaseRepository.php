@@ -40,7 +40,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find($id)
     {
-        return $this->model->where([['id', '=', $id], ['del_flag', '=', 0]])->get();
+        return $this->model->where([['id', '=', $id], ['del_flag', '=', config('global.DEL_FLAG_OFF')]])->get();
     }
 
     /**

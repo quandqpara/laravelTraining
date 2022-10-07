@@ -38,44 +38,99 @@ function displayNotification()
  * Print the result from query
  * @return void
  */
-function displayTableResult($teams): void
+function displayTableResult($data, $table, $teams = []): void
 {
-    $teamData = $teams->toArray();
-    $teamData = $teamData['data'];
-
-    if (empty($teams) || empty($teamData)) {
+    $arrData = $data->toArray();
+    $arrData = $arrData['data'];
+    $colspan = ($table == 'teams') ? 3 : 6;
+    if (empty($data) || empty($arrData)) {
         echo '<tr>';
-        echo '<td colspan="3"><span>No Results Found!</span></td>';
+        echo '<td colspan="' . $colspan . '"><span>No Results Found!</span></td>';
         echo '</tr>';
     } else {
-        foreach ($teams as $team) {
-            printRow($team);
+        foreach ($data as $record) {
+            if ($table == 'teams') {
+                printRow($record);
+            } elseif ($table == 'employees') {
+                printRowEmployee($record, $teams);
+            }
         }
     }
 }
 
 /**
  * Print each row of result
- * @param $team
+ * @param $record
  * @return void
  */
-function printRow($team)
+function printRow($record)
 {
     echo '<tr>';
-    foreach ($team->toArray() as $key) {
+    foreach ($record->toArray() as $key) {
         echo '<td>' . $key . '</td>';
     }
     echo '<td class="col-2">';
     echo '<div class="btn-container">';
     echo '<div class="col-auto">';
-    echo '<a class="btn btn-dark" href="' . setHrefTeam('edit', $team['id']) . '">EDIT</a>';
+    echo '<a class="btn btn-dark" href="' . setHrefTeam('edit', $record['id']) . '">EDIT</a>';
     echo '</div>';
     echo '<div class="col-auto">';
-    echo '<a class="btn btn-danger" href="' . setHrefTeam('delete', $team['id']) . '">DELETE</a>';
+    echo '<a class="btn btn-danger" href="' . setHrefTeam('delete', $record['id']) . '">DELETE</a>';
     echo '</div>';
     echo '</div>';
     echo '</td>';
     echo '</tr>';
+}
+
+/**
+ * Print each row of result
+ * @param $record
+ * @return void
+ */
+function printRowEmployee($record, $teams = [])
+{
+    $handledRecord = handleEmployeeRecord($record, $teams);
+    echo '<tr>';
+    foreach ($handledRecord as $key => $value) {
+        if ($key == 'avatar') {
+            echo '<td><img src="' . asset($value) . '"></td>';
+        } else {
+            echo '<td>' . $value . '</td>';
+        }
+    }
+    echo '<td class="col-2">';
+    echo '<div class="btn-container">';
+    echo '<div class="col-auto">';
+    echo '<a class="btn btn-dark" href="' . setHrefEmployee('edit', $record['id']) . '">EDIT</a>';
+    echo '</div>';
+    echo '<div class="col-auto">';
+    echo '<a class="btn btn-danger" href="' . setHrefEmployee('delete', $record['id']) . '">DELETE</a>';
+    echo '</div>';
+    echo '</div>';
+    echo '</td>';
+    echo '</tr>';
+}
+
+function handleEmployeeRecord($record, $teams = [])
+{
+
+    $handleRecord = [];
+    $handleRecord['id'] = $record['id'];
+    $handleRecord['avatar'] = $record['avatar'];
+    $handleRecord['team_id'] = setTeamNameByID($record['team_id'], $teams);
+    $handleRecord['name'] = $record['last_name'] . ' ' . $record['first_name'];
+    $handleRecord['email'] = $record['email'];
+
+    return $handleRecord;
+}
+
+function setTeamNameByID($teamID, $teamList)
+{
+    foreach ($teamList as $team) {
+        if ($team->id == $teamID) {
+            return $team->name;
+        }
+    }
 }
 
 /**
@@ -91,6 +146,139 @@ function setHrefTeam($buttonType, $id)
     }
     if ($buttonType = 'delete') {
         return route('team.delete', ['id' => $id]);
+    }
+}
+
+/**
+ * Get button type and target id -> Return a route redirect
+ * @param $buttonType
+ * @param $id
+ * @return string|void
+ */
+function setHrefEmployee($buttonType, $id)
+{
+    if ($buttonType = 'edit') {
+        return route('employee.editEmployee', ['id' => $id]);
+    }
+    if ($buttonType = 'delete') {
+        return route('employee.delete', ['id' => $id]);
+    }
+}
+
+/**
+ * @throws ContainerExceptionInterface
+ * @throws NotFoundExceptionInterface
+ */
+function setDropdown(array $data, $dropDownId, $dropDownName)
+{
+    $old = request()->has($dropDownName) ?? false;
+    if (!$old || $_SERVER['PATH_INFO'] == '/employees/create') {
+        echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
+        echo '<option value="">-Select-</option>';
+    } else {
+        $oldSelectionName = '';
+        foreach ($data as $key) {
+            if (!is_array($key)) {
+                if ($key->id == request()->get($dropDownName)) {
+                    $oldSelectionName = $key->name;
+                }
+            } else {
+                if ($key['id'] == request()->get($dropDownName)) {
+                    $oldSelectionName = $key['name'];
+                }
+            }
+
+        }
+
+        echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
+        echo '<option value="' . request()->get($dropDownName) . '">' . $oldSelectionName . '</option>';
+        echo '<option value="">-Empty-</option>';
+    }
+
+    foreach ($data as $key) {
+        if (!is_array($key)) {
+            echo '<option value="' . $key->id . '">' . $key->name . '</option>';
+        } else {
+            echo '<option value="' . $key['id'] . '">' . $key['name'] . '</option>';
+        }
+    }
+    echo '</select>';
+}
+
+function isChecked($field, $value)
+{
+    if (request()->get($field) == $value) {
+        return 'checked';
+    }
+}
+
+function handleAvatar()
+{
+    $imageName = null;
+    $imageUrl = null;
+
+    if (request()->hasFile('avatar')) {
+        $image = request()->file(('avatar'));
+        $imageName = 'temp_' . time() . '_' . $image->getClientOriginalName();
+        $image->storeAs('public/temp/', $imageName);
+        $imageUrl = 'storage/temp/' . $imageName;
+        session()->put('tempImgUrl', $imageUrl);
+    } else {
+        $imageName = str_replace('storage/temp/', '', session()->get('tempImgUrl'));
+        $imageUrl = session()->get('tempImgUrl');
+    }
+
+    request()->merge([
+        'avatar_name' => $imageName,
+        'avatar_url' => $imageUrl,
+    ]);
+
+}
+
+/**
+ * @throws ContainerExceptionInterface
+ * @throws NotFoundExceptionInterface
+ */
+function displayImage()
+{
+    return session()->get('tempImgUrl') ?? '/default/avatar/default-user-avatar.png';
+}
+
+function displayPassword($password)
+{
+    return str_repeat('*', strlen($password));
+}
+
+function displayTeamName($teamId, $teamsList)
+{
+    foreach ($teamsList as $key) {
+        if ($key->id == $teamId) {
+            return $key->name;
+        }
+    }
+}
+
+function displayDropDownInput($id, $listValue)
+{
+    foreach ($listValue as $key) {
+        if ($key['id'] == $id) {
+            return $key['name'];
+        }
+    }
+}
+
+function displayRadioInput($field, $value)
+{
+    if ($field == 'gender') {
+        if ($value == 1) {
+            return 'Male';
+        }
+        return 'Female';
+    } elseif ($field == 'status') {
+        if ($value == 1) {
+            return 'On working';
+        }
+        return 'Retired';
     }
 }
 
@@ -129,112 +317,99 @@ function setSortHrefTeam($selectedColumn, $previousColumn, $previousDirection)
 }
 
 /**
+ * @param $selectedColumn -> the column that is about to be clicked
+ * @param $previousColumn -> the column on URI a.k.a the previous queries Column
+ * @param $previousDirection -< the direction on URI a.k.a the previous queries Direction
+ * @return string|void
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function setDropdown(array $data, $dropDownId, $dropDownName){
-    $old = request()->has($dropDownName) ?? false;
-    if(!$old){
-        echo '<select id="'.$dropDownId. '" name="'.$dropDownName.'">';
-        echo '<option value="" disabled selected>-Select-</option>';
-    }
+function setSortHrefEmployee($selectedColumn, $previousColumn, $previousDirection)
+{
+    //requested column & direction a.k.a previous request
+    $column = $previousColumn ?? 'id';
+    $direction = $previousDirection ?? 'asc';
 
+    //other stuff
+    $page = request()->has('page') ? request()->get('page') : 1;
+    $name = request()->has('name') ? request()->get('name') : '';
+    $team_id = request()->has('team_id') ? request()->get('team_id') : '';
+    $email = request()->has('email') ? request()->get('email') : '';
+
+    //compare previous request column with selected column
+    //if they are not the same then direction to start with is asc.
+    if ($selectedColumn !== $column) {
+        return route('employee.search', ['name' => $name, 'team_id' => $team_id, 'email' => $email, 'page' => $page, 'column' => $selectedColumn, 'direction' => 'asc']);
+    } //else if previous direction is 'asc' then set the direction to query to 'desc', vice versa
     else {
-
-        $oldSelectionName = '';
-        foreach($data as $key){
-            if(!is_array($key)) {
-                if ($key->id == request()->get($dropDownName)) {
-                    $oldSelectionName = $key->name;
-                }
-            } else {
-                if ($key['id'] == request()->get($dropDownName)) {
-                    $oldSelectionName = $key['name'];
-                }
-            }
-
+        if ($direction == 'asc') {
+            $direction = 'desc';
+            return route('employee.search', ['name' => $name, 'team_id' => $team_id, 'email' => $email, 'page' => $page, 'column' => $column, 'direction' => $direction]);
+        } elseif ($direction == 'desc') {
+            $direction = 'asc';
+            return route('employee.search', ['name' => $name, 'team_id' => $team_id, 'email' => $email, 'page' => $page, 'column' => $column, 'direction' => $direction]);
         }
-
-        echo '<select id="'.$dropDownId. '" name="'.$dropDownName.'">';
-        echo '<option value="'.request()->get($dropDownName).'">'.$oldSelectionName.'</option>';
-    }
-
-    foreach ($data as $key){
-        if(!is_array($key)){
-            echo '<option value="'.$key->id.'">'.$key->name.'</option>';
-        } else {
-            echo '<option value="'.$key['id'].'">'.$key['name'].'</option>';
-        }
-    }
-    echo '</select>';
-}
-
-function isChecked($field, $value){
-    if(request()->get($field) == $value){
-        return 'checked';
     }
 }
 
-function handleAvatar(){
-    $imageName = null;
-    $imageUrl = null;
-
-    if(request()->hasFile('avatar')) {
-        $image = request()->file(('avatar'));
-        $imageName = 'temp_'.time().'_'.$image->getClientOriginalName();
-        $image->storeAs('public/temp/', $imageName);
-        $imageUrl = 'storage/temp/'.$imageName;
-        session()->put('tempImgUrl', $imageUrl);
-    } else {
-        $imageName = str_replace('storage/temp/','', session()->get('tempImgUrl'));
-        $imageUrl = session()->get('tempImgUrl');
-    }
-
-    request()->merge([
-        'avatar_name' => $imageName,
-        'avatar_url' => $imageUrl,
-    ]);
-
+function replacePercent(string $phrase)
+{
+    return str_replace('%', '\%', $phrase);
 }
 
 /**
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function displayImage(){
-    return session()->get('tempImgUrl') ?? '/default/avatar/default-user-avatar.png';
+function setDropdownEdit(array $data, $dropDownId, $dropDownName, $target)
+{
+    $old = request()->has($dropDownName) ?? false;
+    $name = getOldName($data, $target[$dropDownName]);
+
+    if (!$old) {
+        echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
+        echo '<option value="' . $target['team_id'] . '">' .$name . '</option>';
+    } else {
+        $oldSelectionName = getOldName($data, request()->get($dropDownName));
+        echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
+        echo '<option value="' . request()->get($dropDownName) . '">' . $oldSelectionName . '</option>';
+        echo '<option value="">-Empty-</option>';
+    }
+
+    foreach ($data as $key) {
+        if (!is_array($key)) {
+            echo '<option value="' . $key->id . '">' . $key->name . '</option>';
+        } else {
+            echo '<option value="' . $key['id'] . '">' . $key['name'] . '</option>';
+        }
+    }
+    echo '</select>';
 }
 
-function displayPassword($password){
-    return str_repeat('*', strlen($password));
-}
-
-function displayTeamName($teamId, $teamsList){
-    foreach ($teamsList as $key){
-        if($key->id == $teamId){
-            return $key->name;
+function getOldName($data, $id)
+{
+    $oldSelectionName = '';
+    foreach ($data as $key) {
+        if (!is_array($key)) {
+            if ($key->id == $id) {
+                $oldSelectionName = $key->name;
+                return $oldSelectionName;
+            }
+        } else {
+            if ($key['id'] == $id) {
+                $oldSelectionName = $key['name'];
+                return $oldSelectionName;
+            }
         }
     }
 }
 
-function displayDropDownInput($id, $listValue){
-    foreach ($listValue as $key){
-        if($key['id'] == $id){
-            return $key['name'];
-        }
+function isCheckedEdit($field, $value){
+    if($field == $value){
+        return 'checked';
     }
 }
 
-function displayRadioInput($field, $value){
-    if($field == 'gender'){
-        if($value == 1){
-            return 'Male';
-        }
-        return 'Female';
-    } elseif ($field == 'status'){
-        if($value == 1){
-            return 'On working';
-        }
-        return 'Retired';
-    }
+function setDate($date){
+    return strstr($date, ' ', true);
 }

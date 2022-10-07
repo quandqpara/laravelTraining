@@ -35,6 +35,7 @@ class TeamsController extends Controller
     {
         $name = "";
         $teams = $this->teamsRepo->findByName($name);
+
         return view('teams/searchTeam')->with('teams', $teams);
     }
 
