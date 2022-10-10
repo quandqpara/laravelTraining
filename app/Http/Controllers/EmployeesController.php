@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateEmployeeRequest;
+use App\Http\Requests\EditEmployeeRequest;
+use App\Http\Requests\EditTeamRequest;
 use App\Repositories\Employees\EmloyeesRepository;
 use App\Repositories\Employees\EmployeesRepositoryInterface;
 use Illuminate\Contracts\Foundation\Application;
@@ -19,9 +21,9 @@ class EmployeesController extends Controller
      * @var EmployeesRepositoryInterface | EmloyeesRepository
      */
     protected EmloyeesRepository|EmployeesRepositoryInterface $employeesRepo;
-    protected $positionList;
-    protected $typeOfWork;
-    protected $teams;
+    protected array $positionList;
+    protected array $typeOfWork;
+    protected array $teams;
 
     public function __construct(EmployeesRepositoryInterface $employeesRepo)
     {
@@ -32,19 +34,19 @@ class EmployeesController extends Controller
     }
 
     //-------------------------------------------VIEWS------------------------------------------------------------------
-    public function searchEmployee()
+    public function searchEmployee(): Factory|View|Application
     {
         $employees = $this->employeesRepo->findAll();
 
         return view('employees/searchEmployee', ['teams' => $this->teams, 'employees' => $employees]);
     }
 
-    public function createEmployee()
+    public function createEmployee(): Factory|View|Application
     {
         return view('employees/createEmployee', ['teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
-    public function createEmployeeConfirm(CreateEmployeeRequest $request)
+    public function createEmployeeConfirm(CreateEmployeeRequest $request): Factory|View|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|Application
     {
         $data = $request->all();
 
@@ -57,10 +59,20 @@ class EmployeesController extends Controller
         return view('employees/createEmployeeConfirm', ['employeeData' => $data, 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
-    public function editEmployee(int $id){
+    public function editEmployee(int $id): Factory|View|Application
+    {
         $find = $this->employeesRepo->find($id);
         $target = $find->toArray();
+        session()->put('avatar_path', $target['0']['avatar']);
         return view('employees/editEmployee',['target'=>$target['0'], 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
+    }
+
+    public function editEmployeeConfirm(EditEmployeeRequest $request): Factory|View|Application
+    {
+        $data = $request->all();
+        $data = correctingInputForEdit($data);
+
+        return view('employees/editEmployeeConfirm', ['data'=>$data, 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
     //--------------------------------------------CRUD------------------------------------------------------------------
@@ -93,9 +105,7 @@ class EmployeesController extends Controller
         Session::flash('success', $message);
         rename($temp, $avatar);
         session()->forget('tempImgUrl');
-        $teams = $this->employeesRepo->getTeamList();
-        $employees = $this->employeesRepo->findAll();
-        return view('employees.searchEmployee', ['teams' => $teams, 'employees' => $employees]);
+        return $this->index($request);
     }
 
     /**
@@ -104,16 +114,27 @@ class EmployeesController extends Controller
      * @param $id
      * @return Application|Factory|View
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $data = $request->all();
+        $temp = $data['avatar'];
+        $avatar = str_replace('temp/temp_', 'auth/', $temp);
+        $data['avatar'] = $avatar;
 
-        //viet form request
 
-        $employee = $this->employeesRepo->update($id, $request);
-        //check this output
-        return view('employees.update');
+        $employee = $this->employeesRepo->update($data, $data['id']);
 
+        if ($employee == false) {
+            $request->flash();
+            Session::flash('message', 'Failed to update. Please try again!');
+            return redirect('employees/editEmployee/' . $data['id']);
+        }
+
+        rename($temp, $avatar);
+        session()->forget('avatar_path');
+        session()->forget('tempImgUrl');
+        Session::flash('success', 'Employee ' . $data['last_name'] . ' ' . $data['first_name'] . ' information has been edited!');
+        return $this->index($request);
     }
 
     /**
@@ -123,14 +144,14 @@ class EmployeesController extends Controller
      */
     public function index(Request $request)
     {
-        $column = $request->get('column');
-        $direction = $request->get('direction');
+
+        $column = $request->get('column') ?? 'id';
+        $direction = $request->get('direction') ?? 'asc';
 
         $employees = $this->employeesRepo->findEmployee($column, $direction);
-        $teams = $this->employeesRepo->getTeamList();
 
         $request->flash();
-        return view('employees.searchEmployee', ['employees' => $employees, 'teams' => $teams, 'column' => $column, 'direction' => $direction]);
+        return view('employees.searchEmployee', ['employees' => $employees, 'teams' => $this->teams, 'column' => $column, 'direction' => $direction]);
     }
 
     /**
@@ -152,9 +173,17 @@ class EmployeesController extends Controller
      */
     public function destroy($id)
     {
+        $name = $this->employeesRepo->getName($id);
         $result = $this->employeesRepo->delete($id);
-        //check this $result
-        return view('employees.search');
+
+        if ($result == false) {
+            Session::flash('success', 'The employee has not been deleted!');
+            return redirect('employees/searchEmployee/' . $id);
+        }
+
+        Session::flash('success', 'Employee ' . $name . ' has been deleted!');
+        return $this->searchEmployee();
     }
 
 }
+

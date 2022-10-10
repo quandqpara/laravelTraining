@@ -104,9 +104,8 @@ class TeamsController extends Controller
         }
 
         $message = 'Team ' . $data['name'] . ' has been created!';
-        unset($request);
         Session::flash('success', $message);
-        return $this->searchTeam();
+        return $this->index($request);
     }
 
     /**
@@ -119,26 +118,25 @@ class TeamsController extends Controller
     public function update(EditTeamRequest $request)
     {
         $data = $request->all();
-        $data = $this->teamsRepo->includeTime($data);
-        $id = $data['id'];
+
         try {
-            $result = $this->teamsRepo->update($data, $id);
+            $result = $this->teamsRepo->update($data, $data['id']);
         } catch (QueryException $e) {
             $errorCode = $e->errorInfo[1];
             if ($errorCode == 1062) {
                 $request->flash();
-                return redirect('teams/editTeam/' . $id)->with('message', 'Team name already exist!');
+                return redirect('teams/editTeam/' . $data['id'])->with('message', 'Team name already exist!');
             }
         }
 
         if ($result == false) {
             $request->flash();
             Session::flash('message', 'Failed to update. Please try again!');
-            return redirect('teams/editTeam/' . $id);
+            return redirect('teams/editTeam/' . $data['id']);
         }
 
-        Session::flash('success', 'Team ID:' . $id . ' has been edited!');
-        return $this->searchTeam();
+        Session::flash('success', 'Team ID:' . $data['id'] . ' has been edited!');
+        return $this->index($request);
     }
 
     /**
@@ -146,7 +144,7 @@ class TeamsController extends Controller
      * @return Application|Factory|View
      * basically an array of result from TEAMS table
      */
-    public function index(Request $request, $column, $direction)
+    public function index(Request $request, $column='id', $direction='asc')
     {
         $name = $request->get('name');
         $teams = $this->teamsRepo->findByName($name, $column, $direction);

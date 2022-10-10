@@ -141,10 +141,11 @@ function setTeamNameByID($teamID, $teamList)
  */
 function setHrefTeam($buttonType, $id)
 {
-    if ($buttonType = 'edit') {
+
+    if ($buttonType == 'edit') {
         return route('team.editTeam', ['id' => $id]);
     }
-    if ($buttonType = 'delete') {
+    if ($buttonType == 'delete') {
         return route('team.delete', ['id' => $id]);
     }
 }
@@ -157,10 +158,10 @@ function setHrefTeam($buttonType, $id)
  */
 function setHrefEmployee($buttonType, $id)
 {
-    if ($buttonType = 'edit') {
+    if ($buttonType == 'edit') {
         return route('employee.editEmployee', ['id' => $id]);
     }
-    if ($buttonType = 'delete') {
+    if ($buttonType == 'delete') {
         return route('employee.delete', ['id' => $id]);
     }
 }
@@ -171,12 +172,19 @@ function setHrefEmployee($buttonType, $id)
  */
 function setDropdown(array $data, $dropDownId, $dropDownName)
 {
-    $old = request()->has($dropDownName) ?? false;
-    if (!$old || $_SERVER['PATH_INFO'] == '/employees/create') {
+    $request = request()->has($dropDownName) ?? false;
+    $old = session()->has('_old_input') ?? false;
+
+    dump($request);
+    dump($old);
+
+    $oldSelectionName = '';
+
+    if (!$old && !$request) {
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
         echo '<option value="">-Select-</option>';
-    } else {
-        $oldSelectionName = '';
+    }
+    elseif ($request){
         foreach ($data as $key) {
             if (!is_array($key)) {
                 if ($key->id == request()->get($dropDownName)) {
@@ -191,7 +199,24 @@ function setDropdown(array $data, $dropDownId, $dropDownName)
         }
 
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
-        echo '<option value="' . request()->get($dropDownName) . '">' . $oldSelectionName . '</option>';
+        echo '<option value="'.session()->get('_old_input')[$dropDownName].'">'.$oldSelectionName.'</option>';
+    }
+    elseif($old) {
+        foreach ($data as $key) {
+            if (!is_array($key)) {
+                if ($key->id == old($dropDownName)) {
+                    $oldSelectionName = $key->name;
+                }
+            } else {
+                if ($key['id'] == old($dropDownName)) {
+                    $oldSelectionName = $key['name'];
+                }
+            }
+
+        }
+        dump(old($dropDownName));
+        echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
+        echo '<option value="' . old($dropDownName) . '">' . $oldSelectionName . '</option>';
         echo '<option value="">-Empty-</option>';
     }
 
@@ -208,6 +233,9 @@ function setDropdown(array $data, $dropDownId, $dropDownName)
 function isChecked($field, $value)
 {
     if (request()->get($field) == $value) {
+        return 'checked';
+    }
+    elseif (old($field) == $value) {
         return 'checked';
     }
 }
@@ -368,8 +396,9 @@ function setDropdownEdit(array $data, $dropDownId, $dropDownName, $target)
 
     if (!$old) {
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
-        echo '<option value="' . $target['team_id'] . '">' .$name . '</option>';
-    } else {
+        echo '<option value="' . $target[$dropDownName] . '">' .$name . '</option>';
+    }
+    else {
         $oldSelectionName = getOldName($data, request()->get($dropDownName));
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
         echo '<option value="' . request()->get($dropDownName) . '">' . $oldSelectionName . '</option>';
@@ -411,5 +440,23 @@ function isCheckedEdit($field, $value){
 }
 
 function setDate($date){
-    return strstr($date, ' ', true);
+    $correctDate = strstr($date, ' ', true);
+    if(!$correctDate){
+        return $date;
+    }
+    return $correctDate;
+}
+
+function correctingInputForEdit($data){
+    if(request()->hasFile('avatar')){
+        $data['avatar'] = session('tempImgUrl');
+    } else {
+        $data['avatar'] = session('avatar_path');
+    }
+    foreach ($data as $key => $value){
+        if ( $value == null || $value = ''){
+            unset($data[$key]);
+        }
+    }
+    return $data;
 }

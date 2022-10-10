@@ -78,7 +78,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $attributes = ['del_flag' => 1];
         $attributes = $this->includeTime($attributes);
-        $result = $this->update($id, $attributes);
+        $result = $this->update($attributes, $id);
         if ($result !== false) {
             return true;
         }

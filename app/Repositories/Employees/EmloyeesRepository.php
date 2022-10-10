@@ -76,8 +76,14 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
         return false;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     public function getName($id)
     {
-        // TODO: Implement getName() method.
+        $target = $this->model->find($id);
+        $arr = $target->toArray();
+        return $arr['last_name']. ' ' .$arr['first_name'];
     }
 }

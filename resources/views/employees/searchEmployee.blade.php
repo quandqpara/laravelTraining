@@ -1,5 +1,5 @@
 @extends('app')
-@section('title', 'Employee Search')
+@section('title', 'Search Employee')
 @include('components.hnav')
 
 @section('content')
@@ -142,4 +142,6 @@
             </div>
         </div>
     </div>
+    @dump(old());
+    @dump(session()->all());
 @endsection

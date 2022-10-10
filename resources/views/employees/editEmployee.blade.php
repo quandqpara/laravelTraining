@@ -1,5 +1,5 @@
 @extends('app')
-@section('title', 'Create Employee')
+@section('title', 'Edit Employee')
 @include('components.hnav')
 
 @section('content')
@@ -9,9 +9,23 @@
                 {{ session()->get('message') }}
             </div>
         @endif
-        <form class="the-form" method="POST" action="{{route('employee.createConfirm')}}" enctype="multipart/form-data">
+        <form class="the-form" method="POST" action="{{route('employee.editConfirm')}}" enctype="multipart/form-data">
             @csrf
             <div class="form-box">
+                {{--ID--}}
+                <div class="create-row row g-2 align-items-center">
+                    <div class="col-2">
+                        <label for="avatar" class="col-form-label">ID</label>
+                    </div>
+                    <div class="col-6">
+                        {{$target['id']}}
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" id="id" name="id" class="form-control hide"
+                               value="{{$target['id']}}"
+                        >
+                    </div>
+                </div>
 
                 {{--Avatar--}}
                 <div class="create-row row g-2 align-items-center">
@@ -21,7 +35,7 @@
                     <div class="col-6">
                         <input type="file" id="avatar" name="avatar" class="form-control"
                                accept="image/png, image/jpg, image/jpeg, image/svg, image/svg"
-                               value="{{old('avatar_url'??$target['avatar'])}}"
+                               value="{{old('avatar_url')??asset($target['avatar'])}}"
                         />
                     </div>
                     @if($errors->has('avatar'))
@@ -306,6 +320,7 @@
                 </div>
 
             </div>
+
             <div class="col-auto submit-box d-flex justify-content-between">
                 <button type="button" onclick="resetInput()" class="btn btn-dark"> Reset</button>
                 <button type="submit" class="btn btn-primary"> Confirm</button>
@@ -318,4 +333,6 @@
             }
         </script>
     </div>
+    @dump(old());
+    @dump(session()->all());
 @endsection

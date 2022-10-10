@@ -59,5 +59,8 @@ Route::post('employees/create', [employeesController::class, 'store'])->name('em
 
 //display EDIT view -> take in data and display confirm view (post) -> edit employee (get)
 Route::get('employees/editEmployee/{id}', [employeesController::class, 'editEmployee'])->where('id', '[0-9]+')->name('employee.editEmployee')->middleware('check.admin');;
-Route::post('employees/editConfirm', [employeesController::class, 'editConfirm'])->name('employee.editConfirm')->middleware('check.admin');;
+Route::post('employees/editConfirm', [employeesController::class, 'editEmployeeConfirm'])->name('employee.editConfirm')->middleware('check.admin');;
 Route::post('employees/edit', [employeesController::class, 'update'])->name('employee.edit')->middleware('check.admin');;
+
+//delete team
+Route::get('employees/deleteEmployee/{id}', [EmployeesController::class, 'destroy'])->where('id', '[0-9]+')->name('employee.delete')->middleware('check.admin');
