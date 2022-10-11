@@ -354,6 +354,4 @@
             </div>
         </form>
     </div>
-    @dump(old());
-    @dump(session()->all());
 @endsection

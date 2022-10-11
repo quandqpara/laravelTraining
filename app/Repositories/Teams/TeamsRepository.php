@@ -39,23 +39,14 @@ class TeamsRepository extends BaseRepository implements TeamsRepositoryInterface
      */
     public function findByName($name, $column = 'id', $direction = 'asc')
     {
-        return $this->model->select('id', 'name')
-            ->where([['name', 'LIKE', '%' . $name . '%'],
-                ['del_flag', '=', config('global.DEL_FLAG_OFF')]])
+        $namePhrase = replacePercent($name);
 
+        return $this->model->select('id', 'name')
+            ->when(!empty($namePhrase), function($q) use ($namePhrase){
+                $q->where('name', 'LIKE', '%'.$namePhrase.'%');
+            })
             ->orderBy($column, $direction)
             ->paginate(config('global.PAGE_LIMIT'))
             ->withQueryString();
-    }
-
-    /**
-     * @param $id
-     * @return string
-     */
-    public function getName($id)
-    {
-        $target = $this->model->find($id);
-        $arr = $target->toArray();
-        return $arr['name'];
     }
 }

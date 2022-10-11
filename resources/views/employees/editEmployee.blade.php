@@ -333,6 +333,4 @@
             }
         </script>
     </div>
-    @dump(old());
-    @dump(session()->all());
 @endsection

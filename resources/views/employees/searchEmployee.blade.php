@@ -59,7 +59,7 @@
                             <label for="email" class="col-form-label">Email</label>
                         </div>
                         <div class="col-6 m-3">
-                            <input type="email"
+                            <input type="text"
                                    id="email"
                                    name="email"
                                    class="form-control"
@@ -142,6 +142,4 @@
             </div>
         </div>
     </div>
-    @dump(old());
-    @dump(session()->all());
 @endsection

@@ -87,6 +87,5 @@
             </div>
         </div>
     </div>
-
-    @php dump(request()->all() ?? 'nothing');@endphp
+    @dump(Session()->all())
 @endsection

@@ -40,7 +40,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find($id)
     {
-        return $this->model->where([['id', '=', $id], ['del_flag', '=', config('global.DEL_FLAG_OFF')]])->get();
+        return $this->model->where([['id', '=', $id]])->get();
     }
 
     /**
@@ -64,7 +64,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function update(array $attributes, $id)
     {
         $target = $this->model->findOrFail($id);
-        $attributes = $this->includeTime($attributes);
+        $attributes = $this->includeTimeUpdate($attributes);
         return $target->update($attributes);
     }
 
@@ -76,8 +76,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function delete($id)
     {
-        $attributes = ['del_flag' => 1];
-        $attributes = $this->includeTime($attributes);
+        $attributes = ['del_flag' => config('global.DEL_FLAG_ON')];
         $result = $this->update($attributes, $id);
         if ($result !== false) {
             return true;
@@ -88,16 +87,20 @@ abstract class BaseRepository implements RepositoryInterface
     public function includeTime($data)
     {
         return array_merge($data, [
-            'ins_id' => 1,
+            'ins_id' => config('global.ADMIN_ID'),
             'ins_datetime' => date('Y-m-d H:i:s')]);
     }
 
-    public function getTeamList(){
-        $teams = DB::table('teams')->select('id', 'name')->where('del_flag', '=', 0)->get();
-        return $teams->toArray();
+    public function includeTimeUpdate($data)
+    {
+        return array_merge($data, [
+            'upd_id' => config('global.ADMIN_ID'),
+            'upd_datetime' => date('Y-m-d H:i:s')]);
     }
 
-    public function targetExist($value, $field, $table){
-        return DB::table($table)->where($field, '=', $value)->count();
+    public function getTeamList()
+    {
+        $teams = DB::table('teams')->select('id', 'name')->get();
+        return $teams->toArray();
     }
 }

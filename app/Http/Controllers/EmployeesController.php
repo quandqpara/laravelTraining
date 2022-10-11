@@ -14,6 +14,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use PHPUnit\Exception;
 
 class EmployeesController extends Controller
 {
@@ -50,11 +51,7 @@ class EmployeesController extends Controller
     {
         $data = $request->all();
 
-        $email = $request->get('email');
-
-        if ($this->employeesRepo->targetExist($email, 'email', 'employees') > 0) {
-            return redirect('employees/createEmployee')->with('message', 'Employee already exist!');
-        }
+        $request->flash();
 
         return view('employees/createEmployeeConfirm', ['employeeData' => $data, 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
@@ -63,13 +60,26 @@ class EmployeesController extends Controller
     {
         $find = $this->employeesRepo->find($id);
         $target = $find->toArray();
+
+        if(empty($target['0'])){
+            Session::flash('messages', config('global.TARGET_NOT_FOUND'));
+            return view(route('employee.searchEmployee'));
+        }
+
         session()->put('avatar_path', $target['0']['avatar']);
+
         return view('employees/editEmployee',['target'=>$target['0'], 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
     public function editEmployeeConfirm(EditEmployeeRequest $request): Factory|View|Application
     {
         $data = $request->all();
+
+        if(empty($data)){
+            Session::flash('messages', config('global.TARGET_NOT_FOUND'));
+            return view(route('employee.searchEmployee'));
+        }
+
         $data = correctingInputForEdit($data);
 
         return view('employees/editEmployeeConfirm', ['data'=>$data, 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
@@ -88,23 +98,28 @@ class EmployeesController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        $request->flash();
 
         $temp = $data['avatar'];
         $avatar = str_replace('temp/temp_', 'auth/', $temp);
         $data['avatar'] = $avatar;
 
-        $this->employeesRepo->create($data);
-
-        if (!$this->employeesRepo->isExist($data['email'])) {
-            $request->flash();
-            Session::flash('message', 'Failed to create employee!');
-            return redirect('employees/createEmployee');
+        try{
+            $this->employeesRepo->create($data);
+        } catch (Exception $e) {
+            handleExceptionMessage($e);
+            return redirect(route('employee.createEmployee'));
         }
 
-        $message = 'Employee ' . $data['last_name'] .' '. $data['first_name'] . ' has been created!';
-        Session::flash('success', $message);
+        if (!$this->employeesRepo->isExist($data['email'])) {
+            Session::flash('message', config('messages.CREATE_FAILED'));
+            return redirect(route('employee.createEmployee'));
+        }
+
         rename($temp, $avatar);
         session()->forget('tempImgUrl');
+
+        Session::flash('message', config('messages.CREATE_SUCCESS'));
         return $this->index($request);
     }
 
@@ -117,23 +132,29 @@ class EmployeesController extends Controller
     public function update(Request $request)
     {
         $data = $request->all();
+        $request->flash();
+
         $temp = $data['avatar'];
         $avatar = str_replace('temp/temp_', 'auth/', $temp);
         $data['avatar'] = $avatar;
 
+        try{
+            $employee = $this->employeesRepo->update($data, $data['id']);
+        } catch (Exception $e){
+            handleExceptionMessage($e);
+            return redirect(route('employee.editEmployee'), ['id'=> $data['id']]);
+        }
 
-        $employee = $this->employeesRepo->update($data, $data['id']);
-
-        if ($employee == false) {
-            $request->flash();
-            Session::flash('message', 'Failed to update. Please try again!');
-            return redirect('employees/editEmployee/' . $data['id']);
+        if (!$employee) {
+            Session::flash('message', config('messages.UPDATE_FAILED'));
+            return redirect(route('employee.editEmployee'), ['id'=> $data['id']]);
         }
 
         rename($temp, $avatar);
         session()->forget('avatar_path');
         session()->forget('tempImgUrl');
-        Session::flash('success', 'Employee ' . $data['last_name'] . ' ' . $data['first_name'] . ' information has been edited!');
+
+        Session::flash('message', config('messages.UPDATE_SUCCESS'));
         return $this->index($request);
     }
 
@@ -144,7 +165,6 @@ class EmployeesController extends Controller
      */
     public function index(Request $request)
     {
-
         $column = $request->get('column') ?? 'id';
         $direction = $request->get('direction') ?? 'asc';
 
@@ -173,15 +193,24 @@ class EmployeesController extends Controller
      */
     public function destroy($id)
     {
-        $name = $this->employeesRepo->getName($id);
-        $result = $this->employeesRepo->delete($id);
-
-        if ($result == false) {
-            Session::flash('success', 'The employee has not been deleted!');
-            return redirect('employees/searchEmployee/' . $id);
+        if(empty($id)){
+            Session::flash('message', config('messages.TARGET_NOT_FOUND'));
+            return redirect(route('employee.searchEmployee'));
         }
 
-        Session::flash('success', 'Employee ' . $name . ' has been deleted!');
+        try{
+            $result = $this->employeesRepo->delete($id);
+        } catch (Exception $e){
+            handleExceptionMessage($e);
+            return redirect(route('employee.searchEmployee'));
+        }
+
+        if (!$result) {
+            Session::flash('message', config('messages.DELETE_FAILED'));
+            return redirect(route('employee.searchEmployee'));
+        }
+
+        Session::flash('message', config('messages.DELETE_SUCCESS'));
         return $this->searchEmployee();
     }
 

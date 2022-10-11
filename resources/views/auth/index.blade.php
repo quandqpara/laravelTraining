@@ -51,4 +51,5 @@
             </form>
         </div>
     </div>
+    @dump(Session()->all())
 @endsection

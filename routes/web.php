@@ -16,51 +16,70 @@ use App\Http\Controllers\EmployeesController;
 |
 */
 
-Route::get('/', function () {
-    return view('auth/index');
-});
+
 
 //--AUTH----------------------------------------------------------------------------------------------------------------
-Route::get('auth', [LoginController::class, 'index'])->name('login-page');
-Route::post('auth/login', [LoginController::class, 'login'])->name('login');
+Route::middleware(['check.login'])->group(function () {
+    Route::get('/', function () {
+        return view('auth/index');
+    });
 
-Route::get('auth/registration', [LoginController::class, 'registration'])->name('register-user');
-Route::post('auth/custom-registration', [LoginController::class, 'customRegistration'])->name('register.custom');
+    Route::prefix('auth')->group(function () {
+        Route::get('', [LoginController::class, 'index'])->name('login-page');
+        Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-Route::get('auth/logout', [LoginController::class, 'logOut'])->name('logout');
+        Route::get('/registration', [LoginController::class, 'registration'])->name('register-user');
+        Route::post('/custom-registration', [LoginController::class, 'customRegistration'])->name('register.custom');
 
-//--TEAM----------------------------------------------------------------------------------------------------------------
-//display SEARCH view -> action search (post)---------------------------------------------------------------------------
-Route::get('teams/searchTeam', [TeamsController::class, 'searchTeam'])->name('team.searchTeam')->middleware('check.admin');
-Route::get('teams/search/{column}/{direction}', [TeamsController::class, 'index'])->name('team.search')->middleware('check.admin');;
+        Route::get('/logout', [LoginController::class, 'logOut'])->name('logout');
+    });
+});
 
-//display CREATE view -> take in data and display confirm view (post) -> create team (get)
-Route::get('teams/createTeam', [TeamsController::class, 'createTeam'])->name('team.createTeam')->middleware('check.admin');;
-Route::post('teams/createConfirm', [TeamsController::class, 'createTeamConfirm'])->name('team.createConfirm')->middleware('check.admin');;
-Route::post('teams/create', [TeamsController::class, 'store'])->name('team.create')->middleware('check.admin');;
+route::middleware(['check.admin'])->group(function () {
+    //--TEAM------------------------------------------------------------------------------------------------------------
+    Route::prefix('teams')->group(function () {
+       Route::name('team.')->group(function () {
+           //display SEARCH view -> action search (post)-------------------------------------------------------------------
+           Route::get('/searchTeam', [TeamsController::class, 'searchTeam'])->name('searchTeam');
+           Route::get('/search/{column}/{direction}', [TeamsController::class, 'index'])->name('search');;
 
-//display EDIT view -> take in data and display confirm view (post) -> edit team (post)
-Route::get('teams/editTeam/{id}', [TeamsController::class, 'editTeam'])->where('id', '[0-9]+')->name('team.editTeam')->middleware('check.admin');;
-Route::post('teams/editConfirm', [TeamsController::class, 'editTeamConfirm'])->name('team.editConfirm')->middleware('check.admin');;
-Route::post('teams/edit/', [TeamsController::class, 'update'])->name('team.edit')->middleware('check.admin');;
+           //display CREATE view -> take in data and display confirm view (post) -> create team (get)
+           Route::get('/createTeam', [TeamsController::class, 'createTeam'])->name('createTeam');;
+           Route::post('/createConfirm', [TeamsController::class, 'createTeamConfirm'])->name('createConfirm');;
+           Route::post('/create', [TeamsController::class, 'store'])->name('create');;
 
-//delete team
-Route::get('teams/deleteTeam/{id}', [TeamsController::class, 'destroy'])->where('id', '[0-9]+')->name('team.delete')->middleware('check.admin');
+           //display EDIT view -> take in data and display confirm view (post) -> edit team (post)
+           Route::get('/editTeam/{id}', [TeamsController::class, 'editTeam'])->where('id', '[0-9]+')->name('editTeam');;
+           Route::post('/editConfirm', [TeamsController::class, 'editTeamConfirm'])->name('editConfirm');;
+           Route::post('/edit/', [TeamsController::class, 'update'])->name('edit');;
 
-//--EMPLOYEE------------------------------------------------------------------------------------------------------------
-//display SEARCH view -> action search (post)---------------------------------------------------------------------------
-Route::get('employees/searchEmployee', [employeesController::class, 'searchEmployee'])->name('employee.searchEmployee')->middleware('check.admin');;
-Route::get('employees/search', [employeesController::class, 'index'])->name('employee.search')->middleware('check.admin');;
+           //delete team
+           Route::get('/deleteTeam/{id}', [TeamsController::class, 'destroy'])->where('id', '[0-9]+')->name('delete');
+       });
+    });
 
-//display CREATE view -> take in data and display confirm view (post) -> create employee (get)
-Route::get('employees/createEmployee', [employeesController::class, 'createEmployee'])->name('employee.createEmployee')->middleware('check.admin');;
-Route::post('employees/createConfirm', [employeesController::class, 'createEmployeeConfirm'])->name('employee.createConfirm')->middleware('check.admin');;
-Route::post('employees/create', [employeesController::class, 'store'])->name('employee.create')->middleware('check.admin');;
+    //--EMPLOYEE--------------------------------------------------------------------------------------------------------
+    Route::prefix('employees')->group(function () {
+        Route::name('employee.')->group(function () {
+            //display SEARCH view -> action search (post)-------------------------------------------------------------------
+            Route::get('/searchEmployee', [employeesController::class, 'searchEmployee'])->name('searchEmployee');;
+            Route::get('/search', [employeesController::class, 'index'])->name('search');;
 
-//display EDIT view -> take in data and display confirm view (post) -> edit employee (get)
-Route::get('employees/editEmployee/{id}', [employeesController::class, 'editEmployee'])->where('id', '[0-9]+')->name('employee.editEmployee')->middleware('check.admin');;
-Route::post('employees/editConfirm', [employeesController::class, 'editEmployeeConfirm'])->name('employee.editConfirm')->middleware('check.admin');;
-Route::post('employees/edit', [employeesController::class, 'update'])->name('employee.edit')->middleware('check.admin');;
+            //display CREATE view -> take in data and display confirm view (post) -> create employee (get)
+            Route::get('/createEmployee', [employeesController::class, 'createEmployee'])->name('createEmployee');;
+            Route::post('/createConfirm', [employeesController::class, 'createEmployeeConfirm'])->name('createConfirm');;
+            Route::post('/create', [employeesController::class, 'store'])->name('create');;
 
-//delete team
-Route::get('employees/deleteEmployee/{id}', [EmployeesController::class, 'destroy'])->where('id', '[0-9]+')->name('employee.delete')->middleware('check.admin');
+            //display EDIT view -> take in data and display confirm view (post) -> edit employee (get)
+            Route::get('/editEmployee/{id}', [employeesController::class, 'editEmployee'])->where('id', '[0-9]+')->name('editEmployee');;
+            Route::post('/editConfirm', [employeesController::class, 'editEmployeeConfirm'])->name('editConfirm');;
+            Route::post('/edit', [employeesController::class, 'update'])->name('edit');;
+
+            //delete team
+            Route::get('/deleteEmployee/{id}', [EmployeesController::class, 'destroy'])->where('id', '[0-9]+')->name('delete');
+        });
+    });
+});
+
+
+

@@ -9,6 +9,7 @@ use App\Http\Requests\EditTeamRequest;
 use App\Http\Requests\SearchTeamRequest;
 use App\Repositories\Teams\TeamsRepository;
 use App\Repositories\Teams\TeamsRepositoryInterface;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -47,10 +48,9 @@ class TeamsController extends Controller
     public function createTeamConfirm(CreateTeamRequest $request)
     {
         $name = $request->get('name');
+
         $request->flash();
-        if($this->teamsRepo->targetExist($name,'name','teams') > 0){
-            return redirect('teams/createTeam')->with('message', 'Team already exist!');
-        }
+
         return view('teams/createTeamConfirm')->with('name', $name);
     }
 
@@ -58,6 +58,11 @@ class TeamsController extends Controller
     {
         $find = $this->teamsRepo->find($id);
         $target = $find->toArray();
+
+        if(empty($target['0'])){
+            Session::flash('message', config('global.TARGET_NOT_FOUND'));
+            return view(route('team.searchTeam'));
+        }
         return view('teams/editTeam')->with('target', $target['0']);
     }
 
@@ -65,6 +70,10 @@ class TeamsController extends Controller
     {
         $data = $request->all();
         $request->flash();
+        if(empty($data)){
+            Session::flash('message', config('global.TARGET_NOT_FOUND'));
+            return view(route('team.searchTeam'));
+        }
         return view('teams/editTeamConfirm')->with('data', $data);
     }
 
@@ -83,28 +92,23 @@ class TeamsController extends Controller
     public function store(CreateTeamRequest $request)
     {
         $data = $request->all();
-        $data = $this->teamsRepo->includeTime($data);
+        $request->flash();
 
         //1
         try {
             $this->teamsRepo->create($data);
-        } catch (QueryException $e) {
-            $errorCode = $e->errorInfo[1];
-            if ($errorCode == 1062) {
-                $request->flash();
-                return redirect('teams/createTeam')->with('message', 'Team already exist!');
-            }
+        } catch (Exception $e) {
+           handleExceptionMessage($e);
+           return redirect(route('team.createTeam'));
         }
 
         //2
         if (!$this->teamsRepo->isExist($data['name'])) {
-            $request->flash();
-            Session::flash('message', 'Failed to create team!');
-            return redirect('teams/createTeam');
+            Session::flash('message', config('messages.CREATE_FAILED'));
+            return redirect(route('team.createTeam'));
         }
 
-        $message = 'Team ' . $data['name'] . ' has been created!';
-        Session::flash('success', $message);
+        Session::flash('message', config('messages.CREATE_SUCCESS'));
         return $this->index($request);
     }
 
@@ -118,24 +122,21 @@ class TeamsController extends Controller
     public function update(EditTeamRequest $request)
     {
         $data = $request->all();
+        $request->flash();
 
         try {
             $result = $this->teamsRepo->update($data, $data['id']);
         } catch (QueryException $e) {
-            $errorCode = $e->errorInfo[1];
-            if ($errorCode == 1062) {
-                $request->flash();
-                return redirect('teams/editTeam/' . $data['id'])->with('message', 'Team name already exist!');
-            }
+            handleExceptionMessage($e);
+            return redirect(route('team.editTeam', ['id' => $data['id']]));
         }
 
-        if ($result == false) {
-            $request->flash();
-            Session::flash('message', 'Failed to update. Please try again!');
-            return redirect('teams/editTeam/' . $data['id']);
+        if (!$result) {
+            Session::flash('message', config('messages.UPDATE_FAILED'));
+            return redirect(route('team.editTeam', ['id' => $data['id']]));
         }
 
-        Session::flash('success', 'Team ID:' . $data['id'] . ' has been edited!');
+        Session::flash('message', config('messages.UPDATE_SUCCESS'));
         return $this->index($request);
     }
 
@@ -160,15 +161,19 @@ class TeamsController extends Controller
      */
     public function destroy($id)
     {
-        $name = $this->teamsRepo->getName($id);
-        $result = $this->teamsRepo->delete($id);
-
-        if ($result == false) {
-            Session::flash('success', 'The team has not been deleted!');
-            return redirect('teams/searchTeam/' . $id);
+        try{
+            $result = $this->teamsRepo->delete($id);
+        } catch (Exception $e) {
+            handleExceptionMessage($e);
+            return redirect(route('team.searchTeam'));
         }
 
-        Session::flash('success', 'Team ' . $name . ' has been deleted!');
+        if (!$result) {
+            Session::flash('message', config('messages.DELETE_FAILED'));
+            return redirect(route('team.searchTeam'));
+        }
+
+        Session::flash('message', config('messages.DELETE_SUCCESS'));
         return $this->searchTeam();
     }
 }

@@ -30,14 +30,9 @@
                 </div>
             </div>
             <div class="col-auto submit-box d-flex justify-content-between">
-                <button type="button" onclick="resetInput()" class="btn btn-dark">Back</button>
+                <button type="button" onclick="history.back()" class="btn btn-dark">Back</button>
                 <button type="submit" class="btn btn-primary">Create</button>
             </div>
         </form>
-        <script>
-            function resetInput() {
-                window.location.href = "/teams/createTeam";
-            }
-        </script>
     </div>
 @endsection

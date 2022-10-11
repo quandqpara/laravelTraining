@@ -29,7 +29,7 @@ class EditTeamRequest extends FormRequest
     {
         return [
             'id' => 'required',
-            'name' => 'required|string|min:4|max:64',
+            'name' => 'required|string|min:4|max:64,'.request()->get('id'),
         ];
     }
 }

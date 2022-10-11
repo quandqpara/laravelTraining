@@ -18,7 +18,7 @@ class CheckAdmin
     public function handle(Request $request, Closure $next)
     {
         if(!session()->has('admin')){
-            return redirect('auth')->with('success', 'You are not allow to access this page.');
+            return redirect('auth')->with('message', config('messages.NEED_PERMISSION'));
         }
         return $next($request);
     }

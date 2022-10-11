@@ -53,19 +53,10 @@
                 </div>
 
                 <div class="col-auto submit-box d-flex justify-content-between">
-                    <button type="button" onclick="resetInput()" class="btn btn-dark">Back</button>
+                    <button type="button" onclick="history.back()" class="btn btn-dark">Back</button>
                     <button type="submit" class="btn btn-primary">Edit</button>
                 </div>
             </form>
         @endif
-        <script>
-            function resetInput() {
-                const url = '@php
-                    $prev = session()->get('_previous')['url'];
-                    echo $prev;
-                @endphp';
-                window.location.href = url;
-            }
-        </script>
     </div>
 @endsection

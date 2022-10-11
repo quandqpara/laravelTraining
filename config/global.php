@@ -5,4 +5,6 @@ return [
     'DEL_FLAG_OFF'   => 0,
 
     'PAGE_LIMIT'    => 3,
+
+    'ADMIN_ID' => 1,
 ];

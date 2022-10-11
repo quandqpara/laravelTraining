@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class LoginController extends Controller
 {
@@ -22,13 +23,12 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-
         $credentials = $request->only('email','password');
         if (Auth::attempt($credentials)){
             session()->put('admin',true);
             return redirect()->intended('teams/searchTeam')->with('success','Logged in!');
         }
-
+        writeLog('Logged In at');
         return redirect('auth')->with('success', 'Your credentials might be incorrect!');
     }
 
@@ -46,6 +46,7 @@ class LoginController extends Controller
         $credentials = $request->only('email','password');
         if(Auth::attempt($credentials))
         {
+            writeLog('Logged In at');
             session()->put('admin', true);
             return redirect()->intended('teams/searchTeam')->with('success','You have signed-in!');
         }
@@ -63,9 +64,10 @@ class LoginController extends Controller
     }
 
     public function logOut() {
-        rmdir('storage/temp');
+        Storage::deleteDirectory('public/temp');
         Session::flush();
         Auth::logout();
+        writeLog('Logged Out at');
         return Redirect('auth');
     }
 }

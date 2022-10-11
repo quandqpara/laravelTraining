@@ -324,6 +324,4 @@
             }
         </script>
     </div>
-    @dump(session()->all())
-    @dump(request()->all())
 @endsection
