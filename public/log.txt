@@ -1,0 +1,15 @@
+Logged Out at   Time: 12-10-2022 07:05:17
+Logged out at   Time: 12-10-2022 07:16:11
+Logged in at   Time: 12-10-2022 07:16:15
+Create Employee at Email dquan441@gmail.com   Time: 12-10-2022 07:19:30
+Create Employee at Email dquan441@gmail.com   Time: 12-10-2022 08:06:04
+Create Employee at Email dquan441@gmail.com   Time: 12-10-2022 08:10:20
+Create Employee at Email giangtd.paraline@gmail.com   Time: 12-10-2022 08:16:26
+Logged out at   Time: 12-10-2022 08:25:40
+Logged in at   Time: 12-10-2022 08:30:12
+Delete Employee at ID 17   Time: 12-10-2022 08:50:34
+Error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Khoai Tây' for key 'teams_name_unique' (SQL: update `teams` set `name` = Khoai Tây, `upd_id` = 1, `upd_datetime` = 2022-10-12 08:57:17 where `id` = 17)   Time: 12-10-2022 08:57:17
+Logged out at   Time: 12-10-2022 10:37:52
+Logged in at   Time: 12-10-2022 10:38:03
+Logged in at   Time: 12-10-2022 10:39:24
+Logged out at   Time: 12-10-2022 10:39:37
