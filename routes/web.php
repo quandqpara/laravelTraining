@@ -77,6 +77,9 @@ route::middleware(['check.admin'])->group(function () {
 
             //delete team
             Route::get('/deleteEmployee/{id}', [EmployeesController::class, 'destroy'])->where('id', '[0-9]+')->name('delete');
+
+            //Export CSV
+            Route::get('/export', [EmployeesController::class, 'exportCSV'])->name('exportCSV');
         });
     });
 });

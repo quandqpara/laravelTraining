@@ -90,6 +90,11 @@
                         <button type="submit" class="btn btn-primary btn-block mb-4 btn-submit">Search</button>
                     </div>
                 </div>
+                @if(isset($employees))
+                <div>
+                    <button type="submit" class="btn-export btn btn-secondary" formaction="{{route('employee.exportCSV')}}">Export CSV</button>
+                </div>
+                @endif
             </form>
             <script>
                 function resetForm() {

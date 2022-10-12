@@ -62,7 +62,7 @@
                         <label for="team_id" class="col-form-label">Team*</label>
                     </div>
                     <div class="col-6">
-                        {{setDropdownEdit($teams, 'team_id', 'team_id', $target)}}
+                        {{setDropdown($teams, 'team_id', 'team_id', $target)}}
                     </div>
                     @if($errors->has('team_id'))
                         <div class="col-2"></div>
@@ -83,7 +83,7 @@
                     </div>
                     <div class="col-6">
                         <input type="email" id="email" name="email" class="form-control"
-                               value="{{$target['email']}}"
+                               value="{{old('email') ??$target['email']}}"
                         >
                     </div>
                     @if($errors->has('email'))
@@ -105,7 +105,7 @@
                     </div>
                     <div class="col-6">
                         <input type="text" id="first_name" name="first_name" class="form-control"
-                               value="{{$target['first_name']}}"
+                               value="{{old('first_name') ?? $target['first_name']}}"
                         >
                     </div>
                     @if($errors->has('first_name'))
@@ -127,7 +127,7 @@
                     </div>
                     <div class="col-6">
                         <input type="text" id="last_name" name="last_name" class="form-control"
-                               value="{{$target['last_name']}}"
+                               value="{{old('last_name') ?? $target['last_name']}}"
                         >
                     </div>
                     @if($errors->has('last_name'))
@@ -168,11 +168,11 @@
                         <label for="gender" class="col-form-label">Gender*</label>
                     </div>
                     <div class="col-2">
-                        <input type="radio" id="male" name="gender" value="1" {{isCheckedEdit($target['gender'], 1)}}/>
+                        <input type="radio" id="male" name="gender" value="1" {{isChecked('gender', 1, $target)}}/>
                         <label class="form-label" for="male">Male</label>
                     </div>
                     <div class="col-2">
-                        <input type="radio" id="female" name="gender" value="2" {{isCheckedEdit($target['gender'], 2)}}/>
+                        <input type="radio" id="female" name="gender" value="2" {{isChecked('gender', 2, $target)}}/>
                         <label class="form-label" for="female">Female</label>
                     </div>
                     @if($errors->has('gender'))
@@ -194,7 +194,7 @@
                     </div>
                     <div class="col-6">
                         <input type="date" id="birthday" name="birthday" class="form-control"
-                               value="{{setDate($target['birthday'])}}"
+                               value="{{setDate(old('birthday') ?? $target['birthday'])}}"
                         >
                     </div>
                     @if($errors->has('birthday'))
@@ -216,7 +216,7 @@
                     </div>
                     <div class="col-6">
                         <input type="text" id="address" name="address" class="form-control"
-                               value="{{$target['address']}}"
+                               value="{{old('address') ?? $target['address']}}"
                         >
                     </div>
                     @if($errors->has('address'))
@@ -238,7 +238,7 @@
                     </div>
                     <div class="col-6">
                         <input type="number" id="salary" name="salary" class="form-control"
-                               value="{{$target['salary']}}"
+                               value="{{old('salary') ?? $target['salary']}}"
                         >
                     </div>
                     <div class="col-2"><span><strong> VND</strong></span></div>
@@ -260,7 +260,7 @@
                         <label for="position" class="col-form-label">Position*</label>
                     </div>
                     <div class="col-6">
-                        {{setDropdownEdit($positionList, 'position', 'position',$target)}}
+                        {{setDropdown($positionList, 'position', 'position',$target)}}
                     </div>
                     @if($errors->has('position'))
                         <div class="col-2"></div>
@@ -280,7 +280,7 @@
                         <label for="type_of_work" class="col-form-label">Type of work*</label>
                     </div>
                     <div class="col-6">
-                        {{setDropdownEdit($typeOfWork, 'type_of_work', 'type_of_work', $target)}}
+                        {{setDropdown($typeOfWork, 'type_of_work', 'type_of_work', $target)}}
                     </div>
                     @if($errors->has('type_of_work'))
                         <div class="col-2"></div>
@@ -300,11 +300,12 @@
                         <label for="status" class="col-form-label">Status*</label>
                     </div>
                     <div class="col-3">
-                        <input type="radio" id="on_working" name="status" value="1" {{isCheckedEdit($target['status'], 1)}}/>
+                        <input type="radio" id="on_working" name="status" value="1" {{isChecked('status', 1, $target)}}/>
                         <label class="form-label" for="on_working">On working</label>
                     </div>
                     <div class="col-2">
-                        <input type="radio" id="retired" name="status" value="2" {{isCheckedEdit($target['status'], 2)}}/>
+                        <input type="radio" id="retired" name="status" value="2" {{isChecked('status', 2, $target)}}/>
+
                         <label class="form-label" for="retired">Retired</label>
                     </div>
                     @if($errors->has('status'))
@@ -322,15 +323,9 @@
             </div>
 
             <div class="col-auto submit-box d-flex justify-content-between">
-                <button type="button" onclick="resetInput()" class="btn btn-dark"> Reset</button>
+                <button href="{{route('employee.editEmployee', ['id'=>$target['id']])}}" class="btn btn-dark"> Reset</button>
                 <button type="submit" class="btn btn-primary"> Confirm</button>
             </div>
         </form>
-        <script>
-            function resetInput() {
-                const url = window.location.href;
-                window.location.href = url;
-            }
-        </script>
     </div>
 @endsection

@@ -31,7 +31,7 @@
             </div>
             <div class="col-auto submit-box d-flex justify-content-between">
                 <button type="button" onclick="history.back()" class="btn btn-dark">Back</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" onclick="return confirm('Create?')" class="btn btn-primary">Create</button>
             </div>
         </form>
     </div>

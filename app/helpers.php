@@ -1,23 +1,38 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 //------------------------------------------COMMON HELPERS--------------------------------------------------------------
-function handleExceptionMessage($error){
-    $e = "Error: ". $error->getMessage();
+function handleExceptionMessage($error)
+{
+    $e = "Error: " . $error->getMessage();
     Session::flash('message', $e);
     writeLog($e);
     return $e;
 }
 
-function writeLog($log){
+function writeLog($log)
+{
     $logFile = fopen("log.txt", "a") or die("Unable to open file");
-    $log .= "   Time: ".date('d-m-Y H:i:s')."\n";
+    $log .= "   Time: " . date('d-m-Y H:i:s') . "\n";
     fwrite($logFile, $log);
     fclose($logFile);
+}
+
+function exportCSV($lastQueryData)
+{
+    $handle = fopen('export.csv', 'w') or die("Unable to open file");
+    foreach ($lastQueryData as $row) {
+        if (!is_array($row)) {
+            fputcsv($handle, $row->toArray(), ',');
+        }
+        fputcsv($handle, $row, ',');
+    }
+    fclose($handle);
 }
 
 //------------------------------------------COMMON VIEW HELPERS---------------------------------------------------------
@@ -27,9 +42,11 @@ function writeLog($log){
  */
 function displayTableResult($data, $table, $teams = []): void
 {
+    $colspan = ($table == 'teams') ? 3 : 6;
+
     $arrData = $data->toArray();
     $arrData = $arrData['data'];
-    $colspan = ($table == 'teams') ? 3 : 6;
+
     if (empty($data) || empty($arrData)) {
         echo '<tr>';
         echo '<td colspan="' . $colspan . '"><span>No Results Found!</span></td>';
@@ -93,7 +110,10 @@ function printRow($record)
     echo '<a class="btn btn-dark" href="' . setHrefTeam('edit', $record['id']) . '">EDIT</a>';
     echo '</div>';
     echo '<div class="col-auto">';
-    echo '<a class="btn btn-danger" href="' . setHrefTeam('delete', $record['id']) . '">DELETE</a>';
+    echo "<a  class=\"btn btn-danger\"
+              href=\"" . setHrefTeam('delete', $record['id']) . "\"
+              onclick=\"return confirm('Are you sure to delete this?')\"
+            >DELETE</a>";
     echo '</div>';
     echo '</div>';
     echo '</td>';
@@ -165,6 +185,7 @@ function setSortHrefTeam($selectedColumn, $previousColumn, $previousDirection)
         }
     }
 }
+
 //-----------------------------------------------EMPLOYEE---------------------------------------------------------------
 //-------------------------------------HANDLING FILE
 /**
@@ -221,7 +242,10 @@ function printRowEmployee($record, $teams = [])
     echo '<a class="btn btn-dark" href="' . setHrefEmployee('edit', $record['id']) . '">EDIT</a>';
     echo '</div>';
     echo '<div class="col-auto">';
-    echo '<a class="btn btn-danger" href="' . setHrefEmployee('delete', $record['id']) . '">DELETE</a>';
+    echo "<a  class=\"btn btn-danger\"
+              href=\"" . setHrefEmployee('delete', $record['id']) . "\"
+              onclick=\"return confirm('Are you sure to delete this?')\"
+            >DELETE</a>";
     echo '</div>';
     echo '</div>';
     echo '</td>';
@@ -304,17 +328,17 @@ function setSortHrefEmployee($selectedColumn, $previousColumn, $previousDirectio
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function setDropdown(array $data, $dropDownId, $dropDownName)
+function setDropdown(array $data, $dropDownId, $dropDownName, $target = [])
 {
     $request = request()->has($dropDownName) ?? false;
     $old = session()->has('_old_input') ?? false;
 
     $oldSelectionName = '';
 
-    if (!$old && !$request) {
+    if (!$old && !$request && empty($target)) {
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
         echo '<option value="">-Select-</option>';
-    } elseif ($request) {
+    } elseif ($request && empty($target)) {
         foreach ($data as $key) {
             if (!is_array($key)) {
                 if ($key->id == request()->get($dropDownName)) {
@@ -325,14 +349,12 @@ function setDropdown(array $data, $dropDownId, $dropDownName)
                     $oldSelectionName = $key['name'];
                 }
             }
-
         }
 
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
         echo '<option value="' . session()->get('_old_input')[$dropDownName] . '">' . $oldSelectionName . '</option>';
         echo '<option value="">-Empty-</option>';
-    }
-    elseif ($old) {
+    } elseif ($old && empty($target)) {
         foreach ($data as $key) {
             if (!is_array($key)) {
                 if ($key->id == old($dropDownName)) {
@@ -349,34 +371,20 @@ function setDropdown(array $data, $dropDownId, $dropDownName)
         echo '<option value="' . old($dropDownName) . '">' . $oldSelectionName . '</option>';
         echo '<option value="">-Empty-</option>';
     }
-
-    foreach ($data as $key) {
-        if (!is_array($key)) {
-            echo '<option value="' . $key->id . '">' . $key->name . '</option>';
-        } else {
-            echo '<option value="' . $key['id'] . '">' . $key['name'] . '</option>';
+    elseif (!empty($target)) {
+        foreach ($data as $key) {
+            if (!is_array($key)) {
+                if ($key->id == $target[$dropDownName]) {
+                    $oldSelectionName = $key->name;
+                }
+            } else {
+                if ($key['id'] == $target[$dropDownName]) {
+                    $oldSelectionName = $key['name'];
+                }
+            }
         }
-    }
-    echo '</select>';
-}
-
-/**
- * @throws ContainerExceptionInterface
- * @throws NotFoundExceptionInterface
- */
-function setDropdownEdit(array $data, $dropDownId, $dropDownName, $target)
-{
-    $old = request()->has($dropDownName) ?? false;
-    $name = getOldName($data, $target[$dropDownName]);
-
-    if (!$old) {
         echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
-        echo '<option value="' . $target[$dropDownName] . '">' . $name . '</option>';
-        echo '<option value="">-Empty-</option>';
-    } else {
-        $oldSelectionName = getOldName($data, request()->get($dropDownName));
-        echo '<select id="' . $dropDownId . '" name="' . $dropDownName . '">';
-        echo '<option value="' . request()->get($dropDownName) . '">' . $oldSelectionName . '</option>';
+        echo '<option value="' . $target[$dropDownName] . '">' . $oldSelectionName . '</option>';
         echo '<option value="">-Empty-</option>';
     }
 
@@ -434,11 +442,13 @@ function getOldName($data, $id)
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function isChecked($field, $value)
+function isChecked($field, $value, $target=[])
 {
     if (request()->get($field) == $value) {
         return 'checked';
     } elseif (old($field) == $value) {
+        return 'checked';
+    } elseif (!empty($target) && $target[$field] == $value){
         return 'checked';
     }
 }
@@ -450,7 +460,9 @@ function isChecked($field, $value)
  */
 function isCheckedEdit($field, $value)
 {
-    if ($field == $value) {
+    if (old($field) == $value) {
+        return 'checked';
+    } elseif ($field == $value) {
         return 'checked';
     }
 }
@@ -536,6 +548,7 @@ function correctingInputForEdit($data)
     }
     return $data;
 }
+
 //-------------------------------------------------DB HELPERS
 /**
  * Avoiding return all records when input % to search input

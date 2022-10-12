@@ -52,7 +52,7 @@
                         <label for="team_id" class="col-form-label">Team*</label>
                     </div>
                     <div class="col-6">
-                        {{setDropdownEdit($teams, 'team_id', 'team_id', $data)}}
+                        {{setDropdown($teams, 'team_id', 'team_id', $data)}}
                     </div>
                 </div>
 
@@ -110,11 +110,11 @@
                         <label for="gender" class="col-form-label">Gender*</label>
                     </div>
                     <div class="col-3">
-                        <input type="radio" id="male" name="gender" value="1" {{isCheckedEdit($data['gender'], 1)}}/>
+                        <input type="radio" id="male" name="gender" value="1" {{isChecked('gender', 1, $data)}}/>
                         <label class="form-label" for="male">Male</label>
                     </div>
                     <div class="col-3">
-                        <input type="radio" id="female" name="gender" value="2" {{isCheckedEdit($data['gender'], 2)}}/>
+                        <input type="radio" id="female" name="gender" value="2" {{isChecked('gender', 2, $data)}}/>
                         <label class="form-label" for="female">Female</label>
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                         <label for="position" class="col-form-label">Position*</label>
                     </div>
                     <div class="col-6">
-                        {{setDropdownEdit($positionList, 'position', 'position',$data)}}
+                        {{setDropdown($positionList, 'position', 'position',$data)}}
                     </div>
                 </div>
 
@@ -172,21 +172,20 @@
                         <label for="type_of_work" class="col-form-label">Type of work*</label>
                     </div>
                     <div class="col-6">
-                        {{setDropdownEdit($typeOfWork, 'type_of_work', 'type_of_work', $data)}}
+                        {{setDropdown($typeOfWork, 'type_of_work', 'type_of_work', $data)}}
                     </div>
                 </div>
 
                 {{--status--}}
                 <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="status" class="col-form-label">Status*</label>
+                    <div class="col-3">data                   <label for="status" class="col-form-label">Status*</label>
                     </div>
                     <div class="col-3">
-                        <input type="radio" id="on_working" name="status" value="1" {{isCheckedEdit($data['status'], 1)}}/>
+                        <input type="radio" id="on_working" name="status" value="1" {{isChecked('status', 1, $data)}}/>
                         <label class="form-label" for="on_working">On working</label>
                     </div>
                     <div class="col-3">
-                        <input type="radio" id="retired" name="status" value="2" {{isCheckedEdit($data['status'], 2)}}/>
+                        <input type="radio" id="retired" name="status" value="2" {{isChecked('status', 2, $data)}}/>
                         <label class="form-label" for="retired">Retired</label>
                     </div>
                 </div>
@@ -350,7 +349,7 @@
 
             <div class="col-auto submit-box d-flex justify-content-between">
                 <button type="button" onclick="history.back()" class="btn btn-dark"> Back</button>
-                <button type="submit" class="btn btn-primary"> Edit</button>
+                <button type="submit" onclick="return confirm('Edit?')" class="btn btn-primary"> Edit</button>
             </div>
         </form>
     </div>

@@ -115,4 +115,7 @@ return [
         ],
     ],
 
+    'subject' => 'Chào mừng ban gia nhập hệ thống!',
+    'content' => 'Xin chào! Chúc mừng bạn đã được đăng ký thành công để tham gia hệ thống của chúng tôi.',
+
 ];

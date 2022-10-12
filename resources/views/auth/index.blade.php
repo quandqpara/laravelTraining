@@ -3,11 +3,7 @@
 @include('components.hnav')
 @section('content')
     <div class="d-flex flex-column align-items-center justify-content-center section-container" style="height: 90vh">
-        @if(session()->has('success'))
-            <div class="alert alert-danger">
-                {{ session()->get('success') }}
-            </div>
-        @endif
+        {{displayNotification()}}
         <div class="login-container">
             <form method="POST" action="{{ route('login') }}" class="form-login ">
                 @csrf
@@ -51,5 +47,4 @@
             </form>
         </div>
     </div>
-    @dump(Session()->all())
 @endsection

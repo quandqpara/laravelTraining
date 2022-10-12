@@ -15,7 +15,7 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
      * @param string $direction
      * @return void
      */
-    public function findEmployee($column = 'id', $direction = 'asc')
+    public function findEmployee($column = 'id', $direction = 'asc', $export = false)
     {
         if ($column == 'name') {
             $column = 'last_name';
@@ -23,7 +23,6 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
         $teamID = replacePercent(request()->get('team_id'));
         $name = replacePercent(request()->get('name'));
         $email = replacePercent(request()->get('email'));
-
 
         $result = $this->model->select('id', 'avatar', 'team_id', 'first_name', 'last_name', 'email')
             ->when(!empty($teamID), function ($q) use ($teamID) {
@@ -39,9 +38,14 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
                         ->orWhere(DB::raw("CONCAT(last_name,' ',first_name)"), 'LIKE', '%' . $name . '%');
                 });
             })
-            ->orderBy($column, $direction)
-            ->paginate(config('global.PAGE_LIMIT'))
-            ->withQueryString();
+            ->orderBy($column, $direction);
+
+        if (!$export) {
+            $result = $result->paginate(config('global.PAGE_LIMIT'))
+                ->withQueryString();
+        } elseif ($export){
+            $result = $result->get();
+        }
 
         return $result;
     }

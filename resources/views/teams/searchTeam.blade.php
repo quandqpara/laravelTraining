@@ -87,5 +87,4 @@
             </div>
         </div>
     </div>
-    @dump(Session()->all())
 @endsection

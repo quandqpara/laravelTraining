@@ -109,6 +109,7 @@ class TeamsController extends Controller
         }
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
+        writeLog('Create Team '.$data['name']);
         return $this->index($request);
     }
 
@@ -137,6 +138,7 @@ class TeamsController extends Controller
         }
 
         Session::flash('message', config('messages.UPDATE_SUCCESS'));
+        writeLog('Update Team at ID '.$data['id']);
         return $this->index($request);
     }
 
@@ -173,6 +175,7 @@ class TeamsController extends Controller
             return redirect(route('team.searchTeam'));
         }
 
+        writeLog('Delete Team at ID '.$id);
         Session::flash('message', config('messages.DELETE_SUCCESS'));
         return $this->searchTeam();
     }

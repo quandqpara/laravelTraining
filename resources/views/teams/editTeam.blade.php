@@ -53,16 +53,10 @@
                     </div>
                 </div>
                 <div class="col-auto submit-box d-flex justify-content-between">
-                    <button type="button" onclick="resetInput()" class="btn btn-dark"> Reset</button>
+                    <a href="{{route('team.editTeam', $target['id'])}}" class="btn btn-dark"> Reset</a>
                     <button type="submit" class="btn btn-primary"> Confirm</button>
                 </div>
             </form>
         @endif
-        <script>
-            function resetInput() {
-                const url = window.location.href;
-                window.location.href = url;
-            }
-        </script>
     </div>
 @endsection

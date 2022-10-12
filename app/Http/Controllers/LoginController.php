@@ -26,10 +26,12 @@ class LoginController extends Controller
         $credentials = $request->only('email','password');
         if (Auth::attempt($credentials)){
             session()->put('admin',true);
-            return redirect()->intended('teams/searchTeam')->with('success','Logged in!');
+            Session::flash('message', config('messages.LOG_IN'));
+            writeLog('Logged in at');
+            return redirect(route('team.searchTeam'));
         }
-        writeLog('Logged In at');
-        return redirect('auth')->with('success', 'Your credentials might be incorrect!');
+        Session::flash('message', config('messages.INCORRECT_CREDENTIALS'));
+        return redirect(route('login-page'));
     }
 
     public function customRegistration(Request $request)
@@ -46,12 +48,14 @@ class LoginController extends Controller
         $credentials = $request->only('email','password');
         if(Auth::attempt($credentials))
         {
-            writeLog('Logged In at');
+            writeLog('Logged in at');
             session()->put('admin', true);
-            return redirect()->intended('teams/searchTeam')->with('success','You have signed-in!');
+            Session::flash('message', config('messages.LOG_IN'));
+            return redirect(route('team.searchTeam'));
         }
-
-        return redirect("auth")->with('success', 'Failed to create new account!');
+        $request->flash();
+        Session::flash('message', config('messages.REGISTER_FAILED'));
+        return redirect(route('register-user'));
     }
 
     public function create(array $data)
@@ -67,7 +71,7 @@ class LoginController extends Controller
         Storage::deleteDirectory('public/temp');
         Session::flush();
         Auth::logout();
-        writeLog('Logged Out at');
+        writeLog('Logged out at');
         return Redirect('auth');
     }
 }
