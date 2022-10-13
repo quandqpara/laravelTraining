@@ -3,13 +3,13 @@
 @include('components.hnav')
 
 @section('content')
-    <div class="h-100 w-100 flex-column mb-auto admin-home-sect">
+    <div class="h-90 w-60 flex-column mb-auto admin-home-sect">
         {{displayNotification()}}
 
         <div class="mt-3 mb-3 search-box border border-dark">
             <form method="GET"
                   action="{{route('team.search', ['name'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}"
-                  class="search-form-box m-4 form-create">
+                  class="search-form-box m-4 form-create" novalidate>
 
                 <div class="input-form-box">
                     <!-- Name input -->
@@ -19,6 +19,7 @@
                         </div>
                         <div class="col-6 m-3">
                             <input type="text"
+                                   maxlength="128"
                                    id="name"
                                    name="name"
                                    class="form-control"

@@ -1,4 +1,3 @@
-import './bootstrap';
 $("#name").keyup(function (event) {
     var text = $("#name").val();
     if (text.length > 128) {

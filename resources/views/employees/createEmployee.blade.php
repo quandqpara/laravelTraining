@@ -9,7 +9,7 @@
                 {{ session()->get('message') }}
             </div>
         @endif
-        <form class="the-form" method="POST" action="{{route('employee.createConfirm')}}" enctype="multipart/form-data">
+        <form class="the-form" method="POST" action="{{route('employee.createConfirm')}}" enctype="multipart/form-data" novalidate>
             @csrf
             <div class="form-box">
 
@@ -21,7 +21,7 @@
                     <div class="col-6">
                         <input type="file" id="avatar" name="avatar" class="form-control"
                                accept="image/png, image/jpg, image/jpeg, image/svg, image/svg"
-                               value="{{old('avatar_url'??'')}}"
+                               value="{{Session()->has('tempImgUrl') !== null ? Session()->get('tempImgUrl') : ''}}"
                         />
                     </div>
                     @if($errors->has('avatar'))
@@ -38,9 +38,17 @@
                 <div class="row g-2 align-items-center mt-0.5">
                     <div class="col-2"></div>
                     <div class="col-6 avatar-display border-round">
-                        <img src="{{asset(displayImage())}}">
+                        <img id="preview" src="{{asset(displayImage())}}">
                     </div>
                 </div>
+                <script>
+                    avatar.onchange = evt => {
+                        const [file] = avatar.files
+                        if (file) {
+                            preview.src = URL.createObjectURL(file)
+                        }
+                    }
+                </script>
 
                 {{--Team--}}
                 <div class="create-row row g-2 align-items-center">
@@ -69,7 +77,7 @@
                     </div>
                     <div class="col-6">
                         <input type="email" id="email" name="email" class="form-control"
-                               value="{{ old('email') ?? ''}}"
+                               value="{{old('email') ?? ''}}"
                         >
                     </div>
                     @if($errors->has('email'))
@@ -91,7 +99,7 @@
                     </div>
                     <div class="col-6">
                         <input type="text" id="first_name" name="first_name" class="form-control"
-                               value="{{ old('first_name')??''}}"
+                               value="{{old('first_name')??''}}"
                         >
                     </div>
                     @if($errors->has('first_name'))
@@ -113,7 +121,7 @@
                     </div>
                     <div class="col-6">
                         <input type="text" id="last_name" name="last_name" class="form-control"
-                               value="{{ old('last_name') ?? ''}}"
+                               value="{{old('last_name') ?? ''}}"
                         >
                     </div>
                     @if($errors->has('last_name'))
@@ -313,7 +321,7 @@
 
             </div>
             <div class="col-auto submit-box d-flex justify-content-between">
-                <a href="{{route('employee.createEmployee')}}" class="btn btn-dark"> Reset</a>
+                <a type="button" href="{{route('employee.createEmployee', ['reset' => true])}}" class="btn btn-dark"> Reset</a>
                 <button type="submit" class="btn btn-primary"> Confirm</button>
             </div>
         </form>

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Scopes\FlagScope;
+use Illuminate\Support\Facades\DB;
 
 class Employees extends Model
 {
@@ -57,5 +58,4 @@ class Employees extends Model
             get: fn($value) => ucfirst($value),
         );
     }
-
 }

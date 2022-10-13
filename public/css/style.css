@@ -1,3 +1,20 @@
+.dropdown-item:hover, .navbar-nav .nav-link:hover{
+    color: green!important;
+    text-shadow:
+        0 0 1px #fff,
+        0 0 3px #0fa,
+        0 0 5px #fff,
+        0 0 7px #5271ff,
+        0 0 9px #fff,
+        0 0 11px #0fa,
+        0 0 13px #fff;
+
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
 .dropdown-item.active, .navbar-nav .nav-link.active {
     color: darkred;
     font-weight: bold;
@@ -66,8 +83,12 @@
     width: 1000px;
     max-width: 40%;
     height: 70px;
-    max-height: 8%;
+    max-height: 10%;
     align-items: flex-end;
+}
+
+btn-submit {
+    max-height: 80%;
 }
 
 .result-container {
@@ -141,7 +162,7 @@ img {
 
 .notice-message{
     min-width: 650px;
-    max-width: 40%;
+    max-width: 80vw;
     margin: 0 auto;
     text-align: center;
 }

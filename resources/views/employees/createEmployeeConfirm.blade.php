@@ -309,7 +309,7 @@
 
             </div>
             <div class="col-auto submit-box d-flex justify-content-between">
-                <button type="button" onclick="history.back()" class="btn btn-dark">Back</button>
+                <a href="{{route('employee.createEmployee')}}" class="btn btn-dark"> Back</a>
                 <button type="submit" onclick="return confirm('Create?')" class="btn btn-primary">Create</button>
             </div>
         </form>

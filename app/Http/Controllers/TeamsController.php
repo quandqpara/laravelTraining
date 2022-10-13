@@ -16,6 +16,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,10 +26,12 @@ class TeamsController extends Controller
      * @var TeamsRepositoryInterface|TeamsRepository
      */
     protected $teamsRepo;
+    protected $previousPage;
 
     public function __construct(TeamsRepositoryInterface $teamsRepo)
     {
         $this->teamsRepo = $teamsRepo;
+        $this->previousPage = Session('_previous');
     }
 
     //------------------------------------------------------------VIEWS-------------------------------------------------
@@ -42,6 +45,9 @@ class TeamsController extends Controller
 
     public function createTeam()
     {
+        if(!str_contains($this->previousPage, 'create') && Session('_old_input') !== null){
+            Session::forget('_old_input');
+        }
         return view('teams/createTeam');
     }
 
@@ -56,6 +62,10 @@ class TeamsController extends Controller
 
     public function editTeam(int $id)
     {
+        if(!str_contains($this->previousPage, 'edit') && Session('_old_input') !== null){
+            Session::forget('_old_input');
+        }
+
         $find = $this->teamsRepo->find($id);
         $target = $find->toArray();
 
@@ -87,7 +97,7 @@ class TeamsController extends Controller
      *              2.1, if not -> redirect with error message
      *              2.2, return to search team with success message
      * @param CreateTeamRequest $request data from input
-     * @return Application|Factory|View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(CreateTeamRequest $request)
     {
@@ -110,7 +120,7 @@ class TeamsController extends Controller
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
         writeLog('Create Team '.$data['name']);
-        return $this->index($request);
+        return Redirect::route('team.search', ['name' => $data['name'], 'column'=>'id', 'direction'=>'asc']);
     }
 
     /**
@@ -139,7 +149,7 @@ class TeamsController extends Controller
 
         Session::flash('message', config('messages.UPDATE_SUCCESS'));
         writeLog('Update Team at ID '.$data['id']);
-        return $this->index($request);
+        return Redirect::route('team.search', ['name' => $data['name'], 'column'=>'id', 'direction'=>'asc']);
     }
 
     /**
@@ -177,6 +187,6 @@ class TeamsController extends Controller
 
         writeLog('Delete Team at ID '.$id);
         Session::flash('message', config('messages.DELETE_SUCCESS'));
-        return $this->searchTeam();
+        return Redirect::route('team.search', ['name' => '', 'column'=>'id', 'direction'=>'asc']);
     }
 }

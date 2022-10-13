@@ -99,7 +99,7 @@
                         <label for="password" class="col-form-label">Password*</label>
                     </div>
                     <div class="col-6">
-                        <input type="password" id="password" name="password" class="form-control">
+                        <input type="password" id="password" name="password" class="form-control" value="{{$data['password']}}">
                     </div>
                 </div>
                 @endif
@@ -348,7 +348,7 @@
             </div>
 
             <div class="col-auto submit-box d-flex justify-content-between">
-                <button type="button" onclick="history.back()" class="btn btn-dark"> Back</button>
+                <a href="{{route('employee.editEmployee',['id'=>$data['id']])}}" class="btn btn-dark"> Back</a>
                 <button type="submit" onclick="return confirm('Edit?')" class="btn btn-primary"> Edit</button>
             </div>
         </form>

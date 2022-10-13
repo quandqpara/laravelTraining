@@ -9,7 +9,7 @@
                 {{ session()->get('message') }}
             </div>
         @endif
-        <form class="the-form" method="POST" action="{{route('team.createConfirm')}}">
+        <form class="the-form" method="POST" action="{{route('team.createConfirm')}}"  novalidate>
             @csrf
             <div class="form-box">
                 <div class="create-row row g-2 align-items-center">
@@ -17,7 +17,7 @@
                         <label for="name" class="col-form-label">Team Name:</label>
                     </div>
                     <div class="col-8">
-                        <input type="text" id="name" name="name" class="form-control"
+                        <input type="text" id="name" name="name" maxlength=128" class="form-control"
                                @if(old('name') !== null)
                                    value="{{ old('name') }}"
                             @endif

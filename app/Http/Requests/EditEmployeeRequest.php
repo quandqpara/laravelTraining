@@ -30,7 +30,7 @@ class EditEmployeeRequest extends FormRequest
     public function rules()
     {
         return [
-            'avatar'=>'sometimes|image|mimes:jpeg,jpg,png,gif|max:2048',
+            'avatar'=>'sometimes|image|mimes:jpeg,jpg,svg,png,gif|max:2048',
             'team_id'=>'required|integer|max_digits:11',
             'email'=>'sometimes|email:filter|unique:employees,email,'.request()->get('id'),
             'first_name'=>'required|string|min:2',

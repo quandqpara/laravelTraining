@@ -15,6 +15,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use PHPUnit\Exception;
 
@@ -39,6 +40,9 @@ class EmployeesController extends Controller
     //-------------------------------------------VIEWS------------------------------------------------------------------
     public function searchEmployee(): Factory|View|Application
     {
+        if(Session::has('tempImgUrl')){
+            Session::forget('tempImgUrl');
+        }
         $employees = $this->employeesRepo->findAll();
 
         return view('employees/searchEmployee', ['teams' => $this->teams, 'employees' => $employees]);
@@ -46,6 +50,9 @@ class EmployeesController extends Controller
 
     public function createEmployee(): Factory|View|Application
     {
+        if(request()->has('reset')){
+            Session::forget('tempImgUrl');
+        }
         return view('employees/createEmployee', ['teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
@@ -60,6 +67,10 @@ class EmployeesController extends Controller
 
     public function editEmployee(int $id): Factory|View|Application
     {
+       if(request()->has('reset')){
+           Session::forget('tempImgUrl');
+       }
+
         $find = $this->employeesRepo->find($id);
         $target = $find->toArray();
 
@@ -131,7 +142,7 @@ class EmployeesController extends Controller
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
         writeLog('Create Employee at Email '.$data['email']);
-        return $this->index($request);
+        return Redirect::route('employee.search', ['email' => $data['email'], 'column'=>'id', 'direction'=>'asc']);
     }
 
     /**

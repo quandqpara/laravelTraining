@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="form-box">
-                    <div class="row g-2 align-items-center">
+                    <div class="row g-2 align-items-center mt-3">
                         <div class="col-6">
                             <span>ID: </span>
                         </div>
@@ -42,7 +42,7 @@
                             <span><strong>{{$data['id']}}</strong></span>
                         </div>
                     </div>
-                    <div class="row g-2 align-items-center">
+                    <div class="row g-2 align-items-center mb-3">
                         <div class="col-6">
                             <span>New Team Name:</span>
                         </div>

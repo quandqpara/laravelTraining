@@ -6,7 +6,9 @@
     <div class="h-100 w-100 flex-column mb-auto admin-home-sect">
         {{displayNotification()}}
         <div class="mt-3 mb-3 search-box border border-dark">
-            <form method="GET" action="{{route('employee.search', ['team_id'=>'', 'name'=>'', 'email'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}" class="search-form-box m-4 form-create">
+            <form method="GET"
+                  action="{{route('employee.search', ['team_id'=>'', 'name'=>'', 'email'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}"
+                  class="search-form-box m-4 form-create" novalidate>
                 <div class="input-form-box">
                     <!-- team_id input -->
                     <div class="row g-2 align-items-center mb-3 mt-3">
@@ -91,9 +93,11 @@
                     </div>
                 </div>
                 @if(isset($employees))
-                <div>
-                    <button type="submit" class="btn-export btn btn-secondary" formaction="{{route('employee.exportCSV')}}">Export CSV</button>
-                </div>
+                    <div>
+                        <button type="submit" class="btn-export btn btn-secondary"
+                                formaction="{{route('employee.exportCSV')}}">Export CSV
+                        </button>
+                    </div>
                 @endif
             </form>
             <script>
@@ -116,7 +120,7 @@
                     <tr>
                         <th class="thread-column" scope="col">
                             <a href="{{setSortHrefEmployee('id',$column??'id',$direction??'asc')}}">
-                            ID
+                                ID
                             </a>
                         </th>
                         <th class="thread-column" scope="col">
@@ -129,19 +133,19 @@
                         </th>
                         <th class="thread-column" scope="col">
                             <a href="{{setSortHrefEmployee('name',$column??'id',$direction??'asc')}}">
-                            Name
+                                Name
                             </a>
                         </th>
                         <th class="thread-column" scope="col">
                             <a href="{{setSortHrefEmployee('email',$column??'id',$direction??'asc')}}">
-                            Email
+                                Email
                             </a>
                         </th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                        {{displayTableResult($employees, 'employees', $teams)}}
+                    {{displayTableResult($employees, 'employees', $teams)}}
                     </tbody>
                 </table>
             </div>

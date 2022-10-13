@@ -1,11 +1,11 @@
 @extends('app')
 @section('title', 'Login')
-@include('components.hnav')
+@include('components.loginHnav')
 @section('content')
     <div class="d-flex flex-column align-items-center justify-content-center section-container" style="height: 90vh">
         {{displayNotification()}}
         <div class="login-container">
-            <form method="POST" action="{{ route('login') }}" class="form-login ">
+            <form method="POST" action="{{ route('login') }}" class="form-login" novalidate>
                 @csrf
                 <!-- Email input -->
                 <div class="d-flex flex-column form-outline mt-2">
@@ -18,7 +18,7 @@
                            required
                     />
                     @if($errors->has('email'))
-                        <span class="alert alert-danger">
+                        <span class="err-span no-mg-top">
                         @error('email')
                             {{ $message }}
                             @enderror
@@ -32,7 +32,7 @@
                     <label class="form-label" for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-control" required/>
                     @if($errors->has('password'))
-                        <span class="alert alert-danger">
+                        <span class="err-span no-mg-top">
                         @error('password')
                             {{ $message }}
                             @enderror

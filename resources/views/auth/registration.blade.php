@@ -1,10 +1,10 @@
 @extends('app')
 @section('title', 'Register')
-@include('components.hnav')
+@include('components.loginHnav')
 @section('content')
     <div class="d-flex flex-column align-items-center justify-content-center section-container" style="height: 90vh">
         <div class="login-container">
-            <form method="POST" action="{{route('register.custom')}}" class="form-login ">
+            <form method="POST" action="{{route('register.custom')}}" class="form-login" novalidate>
                 @csrf
                 <!-- Name input -->
                 <div class="d-flex flex-column form-outline mt-2">

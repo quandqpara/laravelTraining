@@ -15,8 +15,8 @@ return [
 
     'UPDATE_SUCCESS' => 'Update succeed!',
     'UPDATE_FAILED' => 'Update failed!',
-    'CREAT_SUCCESS' => 'Create succeed!',
-    'CREAT_FAILED' => 'Create failed!',
+    'CREATE_SUCCESS' => 'Create succeed!',
+    'CREATE_FAILED' => 'Create failed!',
     'DELETE_SUCCESS' => 'Delete succeed!',
     'DELETE_FAILED' => 'Delete failed!',
 

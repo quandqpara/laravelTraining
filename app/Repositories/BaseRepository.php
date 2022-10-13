@@ -98,9 +98,4 @@ abstract class BaseRepository implements RepositoryInterface
             'upd_datetime' => date('Y-m-d H:i:s')]);
     }
 
-    public function getTeamList()
-    {
-        $teams = DB::table('teams')->select('id', 'name')->get();
-        return $teams->toArray();
-    }
 }

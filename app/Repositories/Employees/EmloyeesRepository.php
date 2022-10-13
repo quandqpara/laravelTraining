@@ -3,6 +3,7 @@
 namespace App\Repositories\Employees;
 
 use App\Repositories\Baserepository;
+use App\Repositories\Teams\TeamsRepository;
 use Illuminate\Support\Facades\DB;
 
 class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryInterface
@@ -10,7 +11,6 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
 
     /**
      * find LIKE %name% where del_flag = 0
-     * @param $name
      * @param string $column
      * @param string $direction
      * @return void
@@ -77,5 +77,12 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
         $employee = $this->model->find($id);
         $name = $employee->last_name.' '.$employee->first_name;
         return $name;
+    }
+
+    public function getTeamList()
+    {
+        $teamModal = new TeamsRepository;
+        $teams = $teamModal->getAll();
+        return $teams->toArray();
     }
 }

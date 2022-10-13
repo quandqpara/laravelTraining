@@ -35,6 +35,17 @@ function exportCSV($lastQueryData)
     fclose($handle);
 }
 
+function resetForm($route, $data = []){
+    if(Session::has('tempImgUrl')){
+        Session::forget('tempImgUrl');
+    }
+    if(Session::has('_old_input')){
+        Session::forget('_old_input');
+    }
+
+    return Redirect::route($route, $data);
+}
+
 //------------------------------------------COMMON VIEW HELPERS---------------------------------------------------------
 /**
  * Print the result from query
@@ -71,11 +82,22 @@ function displayTableResult($data, $table, $teams = []): void
 function displayNotification()
 {
     if (session()->has('message')) {
-        echo '<div class="alert alert-success d-flex justify-content-center">';
+        echo '<div class="alert alert-success d-flex justify-content-center notice-message">';
         echo '<span>' . session()->get('message') . '</span>';
         session()->forget('message');
         echo '</div>';
     }
+}
+
+/**
+ * get Current Page Title
+ * @param $url
+ * @return mixed|null
+ */
+function getTitle() {
+    $url = $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    $page = file_get_contents($url);
+    return preg_match('/<title[^>]*>(.*?)<\/title>/ims', $page, $match) ? $match[1] : null;
 }
 
 //------------------------------------------VIEW TEAMS------------------------------------------------------------------
@@ -146,8 +168,8 @@ function setHrefTeam($buttonType, $id)
 function setTeamNameByID($teamID, $teamList)
 {
     foreach ($teamList as $team) {
-        if ($team->id == $teamID) {
-            return $team->name;
+        if ($team['id'] == $teamID) {
+            return $team['name'];
         }
     }
 }
@@ -495,8 +517,8 @@ function displayPassword($password)
 function displayTeamName($teamId, $teamsList)
 {
     foreach ($teamsList as $key) {
-        if ($key->id == $teamId) {
-            return $key->name;
+        if ($key['id'] == $teamId) {
+            return $key['name'];
         }
     }
 }

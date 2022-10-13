@@ -9,4 +9,6 @@ interface EmployeesRepositoryInterface
     public function findEmployee($column, $direction);
 
     public function getName($id);
+
+    public function getTeamList();
 }
