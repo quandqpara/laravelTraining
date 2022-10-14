@@ -14,7 +14,7 @@
                            id="email"
                            name="email"
                            class="form-control"
-                           value="{{old('email')}}"
+                           value="{{old('email')??''}}"
                            required
                     />
                     @if($errors->has('email'))

@@ -53,6 +53,10 @@ class EmployeesController extends Controller
         if(request()->has('reset')){
             Session::forget('tempImgUrl');
         }
+        $previous = Session::get('_previous')['url'];
+        if(str_contains($previous, 'search')){
+            Session::forget('_old_input');
+        }
         return view('employees/createEmployee', ['teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
@@ -65,18 +69,21 @@ class EmployeesController extends Controller
         return view('employees/createEmployeeConfirm', ['employeeData' => $data, 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
-    public function editEmployee(int $id): Factory|View|Application
+    public function editEmployee(int $id)
     {
        if(request()->has('reset')){
            Session::forget('tempImgUrl');
        }
 
+        $lastSearchUrl = Session::get('_previous')['url'];
+        Session::put('lastSearchUrl', $lastSearchUrl);
+
         $find = $this->employeesRepo->find($id);
         $target = $find->toArray();
 
         if (empty($target['0'])) {
-            Session::flash('messages', config('global.TARGET_NOT_FOUND'));
-            return view(route('employee.searchEmployee'));
+            Session::flash('message', config('messages.TARGET_NOT_FOUND'));
+            return Redirect::route('employee.searchEmployee');
         }
 
         session()->put('avatar_path', $target['0']['avatar']);
@@ -84,13 +91,13 @@ class EmployeesController extends Controller
         return view('employees/editEmployee', ['target' => $target['0'], 'teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
     }
 
-    public function editEmployeeConfirm(EditEmployeeRequest $request): Factory|View|Application
+    public function editEmployeeConfirm(EditEmployeeRequest $request)
     {
         $data = $request->all();
 
         if (empty($data)) {
-            Session::flash('messages', config('global.TARGET_NOT_FOUND'));
-            return view(route('employee.searchEmployee'));
+            Session::flash('message', config('messages.TARGET_NOT_FOUND'));
+            return Redirect::route('employee.searchEmployee');
         }
 
         $data = correctingInputForEdit($data);
@@ -106,7 +113,7 @@ class EmployeesController extends Controller
      * -> create success ->
      * Create function
      * @param Request $request data from input
-     * @return Application|Factory|View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -142,13 +149,13 @@ class EmployeesController extends Controller
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
         writeLog('Create Employee at Email '.$data['email']);
-        return Redirect::route('employee.search', ['email' => $data['email'], 'column'=>'id', 'direction'=>'asc']);
+        return Redirect::route('employee.searchEmployee');
     }
 
     /**
      * Update function
      * @param Request $request data from input
-     * @return Application|Factory|View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)
     {
@@ -175,9 +182,12 @@ class EmployeesController extends Controller
         session()->forget('avatar_path');
         session()->forget('tempImgUrl');
 
+        $rediectDestination = Session::get('lastSearchUrl');
+        Session::forget('lastSearchUrl');
+
         Session::flash('message', config('messages.UPDATE_SUCCESS'));
         writeLog('Update Employee at ID '.$data['id']);
-        return $this->index($request);
+        return Redirect()->to($rediectDestination);
     }
 
     /**
@@ -188,7 +198,7 @@ class EmployeesController extends Controller
     public function index(Request $request)
     {
         $column = $request->get('column') ?? 'id';
-        $direction = $request->get('direction') ?? 'asc';
+        $direction = $request->get('direction') ?? 'desc';
 
         $employees = $this->employeesRepo->findEmployee($column, $direction, false);
 
@@ -211,7 +221,7 @@ class EmployeesController extends Controller
     /**
      * Delete function by ID
      * @param $id
-     * @return Application|Factory|View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
     {
@@ -234,7 +244,7 @@ class EmployeesController extends Controller
 
         writeLog('Delete Employee at ID '.$id);
         Session::flash('message', config('messages.DELETE_SUCCESS'));
-        return $this->searchEmployee();
+        return Redirect::route('employee.searchEmployee');
     }
 
     //-------------------------------------------OTHERS-----------------------------------------------------------------

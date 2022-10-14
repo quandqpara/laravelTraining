@@ -6,6 +6,27 @@
     <div class="h-90 w-60 flex-column mb-auto admin-home-sect">
         {{displayNotification()}}
 
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Delete This Team?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure?
+                    </div>
+                    <div class="modal-footer">
+                        <form method="GET">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mt-3 mb-3 search-box border border-dark">
             <form method="GET"
                   action="{{route('team.search', ['name'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}"
@@ -69,23 +90,52 @@
                     <thead class="thead-dark">
                     <tr>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefTeam('id',$column??'id',$direction??'asc')}}">
-                                ID
+                            <a href="{{setSortHrefTeam('id',$column??'id',$direction??'desc')}}">
+                                ID {{showSortingArrow('id', $column??'id', $direction??'desc', $teams)}}
                             </a>
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefTeam('name',$column??'id',$direction??'asc')}}">
-                                Name
+                            <a href="{{setSortHrefTeam('name',$column??'id',$direction??'desc')}}">
+                                Name {{showSortingArrow('name', $column??'id', $direction??'desc', $teams)}}
                             </a>
                         </th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {{displayTableResult($teams, 'teams')}}
+                    @if(!empty($teams))
+                        @foreach($teams as $team)
+                            <tr>
+                                <td>{{ $team->id }}</td>
+                                <td>{{ $team->name }}</td>
+                                <td class="col-2">
+                                    <div class="btn-container">
+                                        <div class="col-auto">
+                                            <a class="btn btn-dark" href="{{ route('team.editTeam', $team->id) }}">EDIT</a>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-danger del-btn" data-url="{{ route('team.delete', $team->id) }}"  data-bs-toggle="modal" data-bs-target="#exampleModal">DELETE</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="3"><span>No Results Found!</span></td>
+                        </tr>
+                    @endif
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <script>
+        // var myModal = document.getElementById('myModal')
+        // var myInput = document.getElementById('myInput')
+        //
+        // myModal.addEventListener('shown.bs.modal', function () {
+        //     myInput.focus()
+        // })
+    </script>
 @endsection

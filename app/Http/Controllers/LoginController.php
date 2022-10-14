@@ -26,7 +26,6 @@ class LoginController extends Controller
         $credentials = $request->only('email','password');
         if (Auth::attempt($credentials)){
             session()->put('admin',true);
-            Session::flash('message', config('messages.LOG_IN'));
             writeLog('Logged in at');
             return redirect(route('team.searchTeam'));
         }
@@ -50,7 +49,6 @@ class LoginController extends Controller
         {
             writeLog('Logged in at');
             session()->put('admin', true);
-            Session::flash('message', config('messages.LOG_IN'));
             return redirect(route('team.searchTeam'));
         }
         $request->flash();

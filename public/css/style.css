@@ -55,8 +55,6 @@
     padding-right: 5%;
     width: 700px;
     max-width: 65vw;
-    max-height: -webkit-fill-available;
-    overflow: auto;
     min-height: 10vh;
 }
 

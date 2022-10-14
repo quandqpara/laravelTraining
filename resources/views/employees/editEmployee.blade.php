@@ -17,7 +17,7 @@
                     <div class="col-2">
                         <label for="avatar" class="col-form-label">ID</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         {{$target['id']}}
                     </div>
                     <div class="col-auto">
@@ -32,7 +32,7 @@
                     <div class="col-2">
                         <label for="avatar" class="col-form-label">Avatar*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="file" id="avatar" name="avatar" class="form-control"
                                accept="image/png, image/jpg, image/jpeg, image/svg, image/svg image/gif"
                                value="{{Session()->get('tempImgUrl') !== null ? Session()->get('tempImgUrl') : $target['avatar']}}"
@@ -40,7 +40,7 @@
                     </div>
                     @if($errors->has('avatar'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('avatar')
                                  {{ $message }}
@@ -51,22 +51,31 @@
                 </div>
                 <div class="row g-2 align-items-center mt-0.5">
                     <div class="col-2"></div>
-                    <div class="col-8 avatar-display border-round">
-                        <img src="{{Session()->get('tempImgUrl') !== null ? asset(Session()->get('tempImgUrl')) : asset($target['avatar'])}}">
+                    <div class="col-9 avatar-display border-round">
+                        <img id="preview" src="{{Session()->get('tempImgUrl') !== null ? asset(Session()->get('tempImgUrl')) : asset($target['avatar'])}}">
                     </div>
                 </div>
+                <script>
+                    avatar.onchange = evt => {
+                        const [file] = avatar.files
+                        if (file) {
+                            preview.src = URL.createObjectURL(file)
+                        }
+                    }
+                </script>
+
 
                 {{--Team--}}
                 <div class="create-row row g-2 align-items-center">
                     <div class="col-2">
                         <label for="team_id" class="col-form-label">Team*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         {{setDropdown($teams, 'team_id', 'team_id', $target)}}
                     </div>
                     @if($errors->has('team_id'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('team_id')
                                  {{ $message }}
@@ -81,14 +90,14 @@
                     <div class="col-2">
                         <label for="email" class="col-form-label">Email*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="email" id="email" name="email" class="form-control"
                                value="{{old('email') ??$target['email']}}"
                         >
                     </div>
                     @if($errors->has('email'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('email')
                                  {{ $message }}
@@ -103,14 +112,14 @@
                     <div class="col-2">
                         <label for="first_name" class="col-form-label">First Name*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="text" id="first_name" name="first_name" class="form-control"
                                value="{{old('first_name') ?? $target['first_name']}}"
                         >
                     </div>
                     @if($errors->has('first_name'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('first_name')
                                  {{ $message }}
@@ -125,14 +134,14 @@
                     <div class="col-2">
                         <label for="last_name" class="col-form-label">Last Name*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="text" id="last_name" name="last_name" class="form-control"
                                value="{{old('last_name') ?? $target['last_name']}}"
                         >
                     </div>
                     @if($errors->has('last_name'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('last_name')
                                  {{ $message }}
@@ -147,12 +156,12 @@
                     <div class="col-2">
                         <label for="password" class="col-form-label">Password*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="password" id="password" name="password" class="form-control">
                     </div>
                     @if($errors->has('password'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('password')
                                  {{ $message }}
@@ -177,7 +186,7 @@
                     </div>
                     @if($errors->has('gender'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('gender')
                                  {{ $message }}
@@ -192,14 +201,14 @@
                     <div class="col-2">
                         <label for="birthday" class="col-form-label">Birthday*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="date" id="birthday" name="birthday" class="form-control"
                                value="{{setDate(old('birthday') ?? $target['birthday'])}}"
                         >
                     </div>
                     @if($errors->has('birthday'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('birthday')
                                  {{ $message }}
@@ -214,14 +223,14 @@
                     <div class="col-2">
                         <label for="address" class="col-form-label">Address*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="text" id="address" name="address" class="form-control"
                                value="{{old('address') ?? $target['address']}}"
                         >
                     </div>
                     @if($errors->has('address'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('address')
                                  {{ $message }}
@@ -236,7 +245,7 @@
                     <div class="col-2">
                         <label for="salary" class="col-form-label">Salary*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         <input type="number" id="salary" name="salary" class="form-control"
                                value="{{old('salary') ?? $target['salary']}}"
                         >
@@ -244,7 +253,7 @@
                     <div class="col-2"><span><strong> VND</strong></span></div>
                     @if($errors->has('salary'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('salary')
                                  {{ $message }}
@@ -259,12 +268,12 @@
                     <div class="col-2">
                         <label for="position" class="col-form-label">Position*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         {{setDropdown($positionList, 'position', 'position',$target)}}
                     </div>
                     @if($errors->has('position'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('position')
                                  {{ $message }}
@@ -279,12 +288,12 @@
                     <div class="col-2">
                         <label for="type_of_work" class="col-form-label">Type of work*</label>
                     </div>
-                    <div class="col-8">
+                    <div class="col-9">
                         {{setDropdown($typeOfWork, 'type_of_work', 'type_of_work', $target)}}
                     </div>
                     @if($errors->has('type_of_work'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('type_of_work')
                                  {{ $message }}
@@ -310,7 +319,7 @@
                     </div>
                     @if($errors->has('status'))
                         <div class="col-2"></div>
-                        <div class="col-8">
+                        <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('status')
                                  {{ $message }}

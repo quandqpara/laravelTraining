@@ -62,7 +62,10 @@ class TeamsController extends Controller
 
     public function editTeam(int $id)
     {
-        if(!str_contains($this->previousPage, 'edit') && Session('_old_input') !== null){
+        $lastSearchUrl = Session::get('_previous')['url'];
+        Session::put('lastSearchUrl', $lastSearchUrl);
+
+        if(str_contains($this->previousPage, 'search') && Session('_old_input') !== null){
             Session::forget('_old_input');
         }
 
@@ -120,7 +123,7 @@ class TeamsController extends Controller
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
         writeLog('Create Team '.$data['name']);
-        return Redirect::route('team.search', ['name' => $data['name'], 'column'=>'id', 'direction'=>'asc']);
+        return Redirect::route('team.searchTeam');
     }
 
     /**
@@ -147,9 +150,12 @@ class TeamsController extends Controller
             return redirect(route('team.editTeam', ['id' => $data['id']]));
         }
 
+        $rediectDestination = Session::get('lastSearchUrl');
+        Session::forget('lastSearchUrl');
+
         Session::flash('message', config('messages.UPDATE_SUCCESS'));
         writeLog('Update Team at ID '.$data['id']);
-        return Redirect::route('team.search', ['name' => $data['name'], 'column'=>'id', 'direction'=>'asc']);
+        return Redirect()->to($rediectDestination);
     }
 
     /**
@@ -157,9 +163,12 @@ class TeamsController extends Controller
      * @return Application|Factory|View
      * basically an array of result from TEAMS table
      */
-    public function index(Request $request, $column='id', $direction='asc')
+    public function index(Request $request)
     {
         $name = $request->get('name');
+        $column = $request->get('column') ?? 'id';
+        $direction = $request->get('direction') ?? 'desc';
+
         $teams = $this->teamsRepo->findByName($name, $column, $direction);
 
         $request->flash();
@@ -169,7 +178,7 @@ class TeamsController extends Controller
     /**
      * Delete function by ID
      * @param $id
-     * @return Application|Factory|View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
     {
@@ -187,6 +196,6 @@ class TeamsController extends Controller
 
         writeLog('Delete Team at ID '.$id);
         Session::flash('message', config('messages.DELETE_SUCCESS'));
-        return Redirect::route('team.search', ['name' => '', 'column'=>'id', 'direction'=>'asc']);
+        return Redirect::route('team.searchTeam');
     }
 }

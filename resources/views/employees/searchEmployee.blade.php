@@ -5,6 +5,7 @@
 @section('content')
     <div class="h-100 w-100 flex-column mb-auto admin-home-sect">
         {{displayNotification()}}
+
         <div class="mt-3 mb-3 search-box border border-dark">
             <form method="GET"
                   action="{{route('employee.search', ['team_id'=>'', 'name'=>'', 'email'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}"
@@ -119,26 +120,26 @@
                     <thead class="thead-dark">
                     <tr>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('id',$column??'id',$direction??'asc')}}">
-                                ID
+                            <a href="{{setSortHrefEmployee('id',$column??'id',$direction??'desc')}}">
+                                ID {{showSortingArrow('id', $column??'id', $direction??'desc', $employees)}}
                             </a>
                         </th>
                         <th class="thread-column" scope="col">
                             Avatar
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('team_id',$column??'id',$direction??'asc')}}">
-                                Team
+                            <a href="{{setSortHrefEmployee('team_id',$column??'id',$direction??'desc')}}">
+                                Team {{showSortingArrow('team_id', $column??'id', $direction??'desc', $employees)}}
                             </a>
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('name',$column??'id',$direction??'asc')}}">
-                                Name
+                            <a href="{{setSortHrefEmployee('name',$column??'id',$direction??'desc')}}">
+                                Name {{showSortingArrow('name', $column??'id', $direction??'desc', $employees)}}
                             </a>
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('email',$column??'id',$direction??'asc')}}">
-                                Email
+                            <a href="{{setSortHrefEmployee('email',$column??'id',$direction??'desc')}}">
+                                Email {{showSortingArrow('email', $column??'id', $direction??'desc', $employees)}}
                             </a>
                         </th>
                         <th scope="col">Action</th>

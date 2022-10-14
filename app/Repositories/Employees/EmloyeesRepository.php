@@ -15,7 +15,7 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
      * @param string $direction
      * @return void
      */
-    public function findEmployee($column = 'id', $direction = 'asc', $export = false)
+    public function findEmployee($column = 'id', $direction = 'desc', $export = false)
     {
         if ($column == 'name') {
             $column = 'last_name';
@@ -50,7 +50,7 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
         return $result;
     }
 
-    public function findAll($column = 'id', $direction = 'asc')
+    public function findAll($column = 'id', $direction = 'desc')
     {
         return $this->model->select('id', 'avatar', 'team_id', 'first_name', 'last_name', 'email')
             ->orderBy($column, $direction)

@@ -51,3 +51,36 @@ Logged in at   Time: 13-10-2022 07:39:14
 Logged in at   Time: 13-10-2022 08:36:32
 Update Employee at ID 17   Time: 13-10-2022 09:30:09
 Update Employee at ID 17   Time: 13-10-2022 09:32:33
+Logged in at   Time: 14-10-2022 04:52:08
+Logged in at   Time: 14-10-2022 05:06:11
+Logged out at   Time: 14-10-2022 05:07:44
+Create Team Khoai Tây   Time: 14-10-2022 05:11:10
+Create Team Chibi   Time: 14-10-2022 06:36:36
+Create Team Ruby   Time: 14-10-2022 06:36:52
+Create Team Topaz   Time: 14-10-2022 06:37:14
+Create Team Sea Urchin   Time: 14-10-2022 06:37:30
+Create Employee at Email giangtd.dev@gmail.com   Time: 14-10-2022 06:39:13
+Create Employee at Email oriolus1211@gmail.com   Time: 14-10-2022 06:41:21
+Create Employee at Email oriolus12111997@gmail.com   Time: 14-10-2022 06:45:10
+Logged in at   Time: 14-10-2022 06:46:27
+Logged in at   Time: 14-10-2022 06:46:54
+Logged out at   Time: 14-10-2022 06:47:07
+Logged in at   Time: 14-10-2022 06:47:20
+Create Employee at Email dapepefrog@gmail.com   Time: 14-10-2022 06:49:02
+Create Employee at Email meowthekitty@gmail.com   Time: 14-10-2022 06:52:50
+Logged in at   Time: 14-10-2022 07:04:48
+Create Team quan test   Time: 14-10-2022 08:02:28
+Update Team at ID 4   Time: 14-10-2022 08:08:20
+Update Team at ID 4   Time: 14-10-2022 08:08:37
+Create Employee at Email s@gmail.com   Time: 14-10-2022 08:16:37
+Delete Employee at ID 6   Time: 14-10-2022 08:18:22
+Create Team Leopard   Time: 14-10-2022 10:15:11
+Create Team Tiger   Time: 14-10-2022 10:17:23
+Delete Team at ID 6   Time: 14-10-2022 10:17:34
+Update Employee at ID 4   Time: 14-10-2022 10:25:34
+Update Employee at ID 5   Time: 14-10-2022 10:31:52
+Create Employee at Email leopardlead@gmail.com   Time: 14-10-2022 10:32:58
+Create Employee at Email oigioioimetqua@gmail.com   Time: 14-10-2022 10:35:21
+Update Employee at ID 3   Time: 14-10-2022 10:35:49
+Delete Team at ID 8   Time: 14-10-2022 10:56:39
+Delete Team at ID 7   Time: 14-10-2022 12:18:36

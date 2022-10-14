@@ -26,27 +26,42 @@ function writeLog($log)
 function exportCSV($lastQueryData)
 {
     $handle = fopen('export.csv', 'w') or die("Unable to open file");
+
     foreach ($lastQueryData as $row) {
+        $insertToCSV = [];
         if (!is_array($row)) {
-            fputcsv($handle, $row->toArray(), ',');
+            $row = $row->toArray();
         }
-        fputcsv($handle, $row, ',');
+
+        foreach ($row as $column => $value) {
+            array_push($insertToCSV, $column);
+            array_push($insertToCSV, $value);
+        }
+
+        fputcsv($handle, $insertToCSV, ',');
     }
     fclose($handle);
 }
 
-function resetForm($route, $data = []){
-    if(Session::has('tempImgUrl')){
-        Session::forget('tempImgUrl');
-    }
-    if(Session::has('_old_input')){
-        Session::forget('_old_input');
-    }
+//------------------------------------------COMMON VIEW HELPERS---------------------------------------------------------
+function showSortingArrow($currentColumn, $columnOnRequest, $directionOnRequest, $data){
+    $arrData = $data->toArray();
+    $arrData = $arrData['data'];
 
-    return Redirect::route($route, $data);
+    if(empty($arrData)){
+        return '';
+    }
+    if($currentColumn !== $columnOnRequest){
+        return '';
+    }
+    if($directionOnRequest == 'asc'){
+        echo '<i class="fa fa-caret-down"></i>';
+    }
+    else {
+        echo '<i class="fa fa-caret-up"></i>';
+    }
 }
 
-//------------------------------------------COMMON VIEW HELPERS---------------------------------------------------------
 /**
  * Print the result from query
  * @return void
@@ -134,7 +149,7 @@ function printRow($record)
     echo '<div class="col-auto">';
     echo "<a  class=\"btn btn-danger\"
               href=\"" . setHrefTeam('delete', $record['id']) . "\"
-              onclick=\"return confirm('Are you sure to delete this?')\"
+                  type=\"button\"  data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\"'
             >DELETE</a>";
     echo '</div>';
     echo '</div>';

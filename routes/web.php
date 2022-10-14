@@ -41,7 +41,7 @@ route::middleware(['check.admin'])->group(function () {
        Route::name('team.')->group(function () {
            //display SEARCH view -> action search (post)-------------------------------------------------------------------
            Route::get('/searchTeam', [TeamsController::class, 'searchTeam'])->name('searchTeam');
-           Route::get('/search/{column}/{direction}', [TeamsController::class, 'index'])->name('search');;
+           Route::get('/search', [TeamsController::class, 'index'])->name('search');;
 
            //display CREATE view -> take in data and display confirm view (post) -> create team (get)
            Route::get('/createTeam', [TeamsController::class, 'createTeam'])->name('createTeam');;

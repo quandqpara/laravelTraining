@@ -37,7 +37,7 @@ class TeamsRepository extends BaseRepository implements TeamsRepositoryInterface
      * @param string $direction
      * @return void
      */
-    public function findByName($name, $column = 'id', $direction = 'asc')
+    public function findByName($name, $column = 'id', $direction = 'desc')
     {
         $namePhrase = replacePercent($name);
 
