@@ -12,4 +12,6 @@ return [
     'DEFAULT_DIRECTION' => 'asc',
 
     'DEFAULT_EXPORT_FILE_PATH' => public_path().'/export.csv',
+
+    'NO_TEAM_EMPLOYEE' => '-Currently in No Team-',
 ];

@@ -40,12 +40,15 @@ class TeamsController extends Controller
         $name = "";
         $teams = $this->teamsRepo->findByName($name);
 
+        $lastSearchUrl = url()->full();
+        Session::put('lastSearchUrl', $lastSearchUrl);
+
         return view('teams/searchTeam')->with('teams', $teams);
     }
 
     public function createTeam()
     {
-        if(!str_contains($this->previousPage, 'create') && Session('_old_input') !== null){
+        if(!str_contains(Session('_previous')['url'], 'create') && Session('_old_input') !== null){
             Session::forget('_old_input');
         }
         return view('teams/createTeam');
@@ -62,8 +65,6 @@ class TeamsController extends Controller
 
     public function editTeam(int $id)
     {
-        $lastSearchUrl = Session::get('_previous')['url'];
-        Session::put('lastSearchUrl', $lastSearchUrl);
 
         if(str_contains($this->previousPage, 'search') && Session('_old_input') !== null){
             Session::forget('_old_input');

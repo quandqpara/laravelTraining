@@ -4,6 +4,7 @@ namespace App\Repositories\Employees;
 
 use App\Repositories\Baserepository;
 use App\Repositories\Teams\TeamsRepository;
+use App\Scopes\FlagScope;
 use Illuminate\Support\Facades\DB;
 
 class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryInterface
@@ -24,21 +25,29 @@ class EmloyeesRepository extends BaseRepository implements EmployeesRepositoryIn
         $name = replacePercent(request()->get('name'));
         $email = replacePercent(request()->get('email'));
 
-        $result = $this->model->select('id', 'avatar', 'team_id', 'first_name', 'last_name', 'email')
-            ->when(!empty($teamID), function ($q) use ($teamID) {
-                $q->where('team_id', '=', $teamID);
-            })
+        $result = $this->model->select('employees.id', 'avatar', 'employees.team_id', 'first_name', 'last_name', 'email', 'teams.name');
+
+        $result->join('teams', 'employees.team_id', '=', 'teams.id');
+
+        $result->when(!empty($teamID), function ($q) use ($teamID) {
+            $q->where('team_id', '=', $teamID);
+        })
             ->when(!empty($email), function ($q) use ($email) {
                 $q->where('email', 'LIKE', '%' . $email . '%');
             })
             ->when(!empty($name), function ($q) use ($name) {
-                $q->where(function($query) use ($name){
+                $q->where(function ($query) use ($name) {
                     $query->where('first_name', 'LIKE', '%' . $name . '%')
                         ->orWhere('last_name', 'LIKE', '%' . $name . '%')
                         ->orWhere(DB::raw("CONCAT(last_name,' ',first_name)"), 'LIKE', '%' . $name . '%');
                 });
-            })
-            ->orderBy($column, $direction);
+            });
+
+        if($column == 'team_id'){
+            $result->orderBy('teams.name', $direction);
+        } else {
+            $result->orderBy($column, $direction);
+        }
 
         if (!$export) {
             $result = $result->paginate(config('global.PAGE_LIMIT'))

@@ -45,6 +45,9 @@ class EmployeesController extends Controller
         }
         $employees = $this->employeesRepo->findAll();
 
+        $lastSearchUrl = url()->full();
+        Session::put('lastSearchUrl', $lastSearchUrl);
+
         return view('employees/searchEmployee', ['teams' => $this->teams, 'employees' => $employees]);
     }
 
@@ -74,9 +77,6 @@ class EmployeesController extends Controller
        if(request()->has('reset')){
            Session::forget('tempImgUrl');
        }
-
-        $lastSearchUrl = Session::get('_previous')['url'];
-        Session::put('lastSearchUrl', $lastSearchUrl);
 
         $find = $this->employeesRepo->find($id);
         $target = $find->toArray();

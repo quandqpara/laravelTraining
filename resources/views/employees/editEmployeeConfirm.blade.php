@@ -3,194 +3,218 @@
 @include('components.hnav')
 
 @section('content')
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit This Employee?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure?
+                </div>
+                <div class="modal-footer">
+                    <form class="the-form" method="POST" action="{{route('employee.edit')}}" enctype="multipart/form-data">
+
+                        @csrf
+                        <div class="form-box hide">
+
+                            {{--ID--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="avatar" class="col-form-label">ID</label>
+                                </div>
+                                <div class="col-6">
+                                    {{$data['id']}}
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" id="id" name="id" class="form-control hide"
+                                           value="{{$data['id']}}"
+                                    >
+                                </div>
+                            </div>
+
+                            {{--Avatar--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="avatar" class="col-form-label">Avatar*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" id="avatar" name="avatar" class="form-control"
+                                           value="{{$data['avatar']}}"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row g-2 align-items-center mt-0.5">
+                                <div class="col-3"></div>
+                                <div class="col-6 avatar-display border-round">
+                                    <img src="{{asset($data['avatar'])}}">
+                                </div>
+                            </div>
+
+                            {{--Team--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="team_id" class="col-form-label">Team*</label>
+                                </div>
+                                <div class="col-6">
+                                    {{setDropdown($teams, 'team_id', 'team_id', $data)}}
+                                </div>
+                            </div>
+
+                            {{--email--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="email" class="col-form-label">Email*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="email" id="email" name="email" class="form-control"
+                                           value="{{$data['email']}}"
+                                    >
+                                </div>
+                            </div>
+
+                            {{--first name--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="first_name" class="col-form-label">First Name*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" id="first_name" name="first_name" class="form-control"
+                                           value="{{$data['first_name']}}"
+                                    >
+                                </div>
+                            </div>
+
+                            {{--last name--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="last_name" class="col-form-label">Last Name*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" id="last_name" name="last_name" class="form-control"
+                                           value="{{$data['last_name']}}"
+                                    >
+                                </div>
+                            </div>
+
+                            {{--password--}}
+                            @if(isset($data['password']) && !empty($data['password']))
+                                <div class="create-row row g-2 align-items-center">
+                                    <div class="col-3">
+                                        <label for="password" class="col-form-label">Password*</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="password" id="password" name="password" class="form-control" value="{{$data['password']}}">
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{--gender--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="gender" class="col-form-label">Gender*</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" id="male" name="gender" value="1" {{isChecked('gender', 1, $data)}}/>
+                                    <label class="form-label" for="male">Male</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" id="female" name="gender" value="2" {{isChecked('gender', 2, $data)}}/>
+                                    <label class="form-label" for="female">Female</label>
+                                </div>
+                            </div>
+
+                            {{--birthday--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="birthday" class="col-form-label">Birthday*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" id="birthday" name="birthday" class="form-control"
+                                           value="{{setDate($data['birthday'])}}"
+                                    >
+                                </div>
+                            </div>
+
+                            {{--address--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="address" class="col-form-label">Address*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" id="address" name="address" class="form-control"
+                                           value="{{$data['address']}}"
+                                    >
+                                </div>
+                            </div>
+
+                            {{--salary--}}
+                            <div class="create-row row g-3 align-items-center">
+                                <div class="col-3">
+                                    <label for="salary" class="col-form-label">Salary*</label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" id="salary" name="salary" class="form-control"
+                                           value="{{$data['salary']}}"
+                                    >
+                                </div>
+                                <div class="col-3"><span><strong> VND</strong></span></div>
+                            </div>
+
+                            {{--position--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="position" class="col-form-label">Position*</label>
+                                </div>
+                                <div class="col-6">
+                                    {{setDropdown($positionList, 'position', 'position',$data)}}
+                                </div>
+                            </div>
+
+                            {{--type_of_work--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">
+                                    <label for="type_of_work" class="col-form-label">Type of work*</label>
+                                </div>
+                                <div class="col-6">
+                                    {{setDropdown($typeOfWork, 'type_of_work', 'type_of_work', $data)}}
+                                </div>
+                            </div>
+
+                            {{--status--}}
+                            <div class="create-row row g-2 align-items-center">
+                                <div class="col-3">data                   <label for="status" class="col-form-label">Status*</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" id="on_working" name="status" value="1" {{isChecked('status', 1, $data)}}/>
+                                    <label class="form-label" for="on_working">On working</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" id="retired" name="status" value="2" {{isChecked('status', 2, $data)}}/>
+                                    <label class="form-label" for="retired">Retired</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="content-container">
         @if(session()->has('message'))
             <div class="notice-message alert alert-danger d-flex justify-content-center">
                 {{ session()->get('message') }}
             </div>
         @endif
-        <form class="the-form" method="POST" action="{{route('employee.edit')}}" enctype="multipart/form-data">
-            @csrf
-            <div class="form-box hide">
-
-                {{--ID--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="avatar" class="col-form-label">ID</label>
-                    </div>
-                    <div class="col-6">
-                        {{$data['id']}}
-                    </div>
-                    <div class="col-auto">
-                        <input type="text" id="id" name="id" class="form-control hide"
-                               value="{{$data['id']}}"
-                        >
-                    </div>
-                </div>
-
-                {{--Avatar--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="avatar" class="col-form-label">Avatar*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="avatar" name="avatar" class="form-control"
-                               value="{{$data['avatar']}}"
-                        />
-                    </div>
-                </div>
-                <div class="row g-2 align-items-center mt-0.5">
-                    <div class="col-3"></div>
-                    <div class="col-6 avatar-display border-round">
-                        <img src="{{asset($data['avatar'])}}">
-                    </div>
-                </div>
-
-                {{--Team--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="team_id" class="col-form-label">Team*</label>
-                    </div>
-                    <div class="col-6">
-                        {{setDropdown($teams, 'team_id', 'team_id', $data)}}
-                    </div>
-                </div>
-
-                {{--email--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="email" class="col-form-label">Email*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="email" id="email" name="email" class="form-control"
-                               value="{{$data['email']}}"
-                        >
-                    </div>
-                </div>
-
-                {{--first name--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="first_name" class="col-form-label">First Name*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="first_name" name="first_name" class="form-control"
-                               value="{{$data['first_name']}}"
-                        >
-                    </div>
-                </div>
-
-                {{--last name--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="last_name" class="col-form-label">Last Name*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="last_name" name="last_name" class="form-control"
-                               value="{{$data['last_name']}}"
-                        >
-                    </div>
-                </div>
-
-                {{--password--}}
-                @if(isset($data['password']) && !empty($data['password']))
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="password" class="col-form-label">Password*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="password" id="password" name="password" class="form-control" value="{{$data['password']}}">
-                    </div>
-                </div>
-                @endif
-
-                {{--gender--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="gender" class="col-form-label">Gender*</label>
-                    </div>
-                    <div class="col-3">
-                        <input type="radio" id="male" name="gender" value="1" {{isChecked('gender', 1, $data)}}/>
-                        <label class="form-label" for="male">Male</label>
-                    </div>
-                    <div class="col-3">
-                        <input type="radio" id="female" name="gender" value="2" {{isChecked('gender', 2, $data)}}/>
-                        <label class="form-label" for="female">Female</label>
-                    </div>
-                </div>
-
-                {{--birthday--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="birthday" class="col-form-label">Birthday*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="date" id="birthday" name="birthday" class="form-control"
-                               value="{{setDate($data['birthday'])}}"
-                        >
-                    </div>
-                </div>
-
-                {{--address--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="address" class="col-form-label">Address*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="address" name="address" class="form-control"
-                               value="{{$data['address']}}"
-                        >
-                    </div>
-                </div>
-
-                {{--salary--}}
-                <div class="create-row row g-3 align-items-center">
-                    <div class="col-3">
-                        <label for="salary" class="col-form-label">Salary*</label>
-                    </div>
-                    <div class="col-6">
-                        <input type="number" id="salary" name="salary" class="form-control"
-                               value="{{$data['salary']}}"
-                        >
-                    </div>
-                    <div class="col-3"><span><strong> VND</strong></span></div>
-                </div>
-
-                {{--position--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="position" class="col-form-label">Position*</label>
-                    </div>
-                    <div class="col-6">
-                        {{setDropdown($positionList, 'position', 'position',$data)}}
-                    </div>
-                </div>
-
-                {{--type_of_work--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">
-                        <label for="type_of_work" class="col-form-label">Type of work*</label>
-                    </div>
-                    <div class="col-6">
-                        {{setDropdown($typeOfWork, 'type_of_work', 'type_of_work', $data)}}
-                    </div>
-                </div>
-
-                {{--status--}}
-                <div class="create-row row g-2 align-items-center">
-                    <div class="col-3">data                   <label for="status" class="col-form-label">Status*</label>
-                    </div>
-                    <div class="col-3">
-                        <input type="radio" id="on_working" name="status" value="1" {{isChecked('status', 1, $data)}}/>
-                        <label class="form-label" for="on_working">On working</label>
-                    </div>
-                    <div class="col-3">
-                        <input type="radio" id="retired" name="status" value="2" {{isChecked('status', 2, $data)}}/>
-                        <label class="form-label" for="retired">Retired</label>
-                    </div>
-                </div>
-
-            </div>
 
             <div class="form-box">
 
@@ -210,7 +234,7 @@
                         <label for="avatar" class="col-form-label">Avatar*</label>
                     </div>
                     <div class="col-6 avatar-display border-round">
-                        <img src="{{asset($data['avatar'])}}">
+                        <img src="{{asset(Session('tempImgUrl'))}}">
                     </div>
                 </div>
 
@@ -262,15 +286,6 @@
                         </div>
                         <div class="col-6">
                             {{displayPassword($data['password'])}}
-                        </div>
-                    </div>
-                @else
-                    <div class="create-row row g-2 align-items-center">
-                        <div class="col-3">
-                            <label for="password" class="col-form-label">Password*</label>
-                        </div>
-                        <div class="col-6">
-                            **********
                         </div>
                     </div>
                 @endif
@@ -349,8 +364,10 @@
 
             <div class="col-auto submit-box d-flex justify-content-between">
                 <a href="{{route('employee.editEmployee',['id'=>$data['id']])}}" class="btn btn-dark"> Back</a>
-                <button type="submit" onclick="return confirm('Edit?')" class="btn btn-primary"> Edit</button>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary del-btn" data-url="{{ route('employee.edit') }}"  data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
+                </div>
             </div>
-        </form>
     </div>
+    @dump(Session()->all())
 @endsection

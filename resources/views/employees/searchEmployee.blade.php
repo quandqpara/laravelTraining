@@ -6,6 +6,27 @@
     <div class="h-100 w-100 flex-column mb-auto admin-home-sect">
         {{displayNotification()}}
 
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Delete This Employee?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure?
+                    </div>
+                    <div class="modal-footer">
+                        <form method="GET">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mt-3 mb-3 search-box border border-dark">
             <form method="GET"
                   action="{{route('employee.search', ['team_id'=>'', 'name'=>'', 'email'=>'','page'=>'1','column'=>'id','direction'=>'asc'])}}"
@@ -120,7 +141,8 @@
                     <thead class="thead-dark">
                     <tr>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('id',$column??'id',$direction??'desc')}}">
+                            @if($employees->toArray()['total'] > 0)
+                            <a href="{{setSortHrefEmployee('id',$column??'id',$direction??'desc')}}"> @endif
                                 ID {{showSortingArrow('id', $column??'id', $direction??'desc', $employees)}}
                             </a>
                         </th>
@@ -128,25 +150,57 @@
                             Avatar
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('team_id',$column??'id',$direction??'desc')}}">
-                                Team {{showSortingArrow('team_id', $column??'id', $direction??'desc', $employees)}}
-                            </a>
+                                 @if($employees->toArray()['total'] > 0)
+                            <a href="{{setSortHrefEmployee('team_id',$column??'id',$direction??'desc')}}"> @endif
+                                Team      @if($employees->toArray()['total'] > 0) {{showSortingArrow('team_id', $column??'id', $direction??'desc', $employees)}}
+                            </a> @endif
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('name',$column??'id',$direction??'desc')}}">
-                                Name {{showSortingArrow('name', $column??'id', $direction??'desc', $employees)}}
-                            </a>
+                                 @if($employees->toArray()['total'] > 0)
+                            <a href="{{setSortHrefEmployee('name',$column??'id',$direction??'desc')}}"> @endif
+                                Name      @if($employees->toArray()['total'] > 0) {{showSortingArrow('name', $column??'id', $direction??'desc', $employees)}}
+                            </a> @endif
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefEmployee('email',$column??'id',$direction??'desc')}}">
-                                Email {{showSortingArrow('email', $column??'id', $direction??'desc', $employees)}}
-                            </a>
+                                 @if($employees->toArray()['total'] > 0)
+                            <a href="{{setSortHrefEmployee('email',$column??'id',$direction??'desc')}}"> @endif
+                                Email      @if($employees->toArray()['total'] > 0) {{showSortingArrow('email', $column??'id', $direction??'desc', $employees)}}
+                            </a> @endif
                         </th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {{displayTableResult($employees, 'employees', $teams)}}
+                    @if($employees->toArray()['total'] > 0)
+                        @foreach($employees as $employee)
+                            <tr>
+                                <td>{{ $employee->id }}</td>
+
+                                <td> <img src="{{ asset($employee->avatar) }}"> </td>
+
+                                <td>{{ setTeamNameByID($employee->team_id, $teams) ?? config('global.NO_TEAM_EMPLOYEE')}}</td>
+
+                                <td>{{ $employee->last_name .' '. $employee->first_name }}</td>
+
+                                <td>{{ $employee->email }}</td>
+
+                                <td class="col-2">
+                                    <div class="btn-container">
+                                        <div class="col-auto">
+                                            <a class="btn btn-dark" href="{{ route('employee.editEmployee', $employee->id) }}">EDIT</a>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-danger del-btn" data-url="{{ route('employee.delete', $employee->id) }}"  data-bs-toggle="modal" data-bs-target="#exampleModal">DELETE</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="6"><span>No Results Found!</span></td>
+                        </tr>
+                    @endif
                     </tbody>
                 </table>
             </div>

@@ -16,6 +16,12 @@ class FlagScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where('del_flag','=', config('global.DEL_FLAG_OFF'));
+        $builder
+            ->when($model->getTable() == 'teams', function ($q) {
+                $q->where('teams.del_flag','=', config('global.DEL_FLAG_OFF'));
+            })
+            ->when($model->getTable() == 'employees', function ($q) {
+                $q->where('employees.del_flag','=', config('global.DEL_FLAG_OFF'));
+            });
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use http\Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Session;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -46,5 +48,14 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Exception|Throwable $e)
+    {
+        if($this->isHttpException($e)){
+            return redirect(route('team.searchTeam'));
+        }
+
+        return parent::render($request, $e);
     }
 }

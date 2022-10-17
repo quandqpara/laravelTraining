@@ -55,36 +55,10 @@ function showSortingArrow($currentColumn, $columnOnRequest, $directionOnRequest,
         return '';
     }
     if($directionOnRequest == 'asc'){
-        echo '<i class="fa fa-caret-down"></i>';
-    }
-    else {
         echo '<i class="fa fa-caret-up"></i>';
     }
-}
-
-/**
- * Print the result from query
- * @return void
- */
-function displayTableResult($data, $table, $teams = []): void
-{
-    $colspan = ($table == 'teams') ? 3 : 6;
-
-    $arrData = $data->toArray();
-    $arrData = $arrData['data'];
-
-    if (empty($data) || empty($arrData)) {
-        echo '<tr>';
-        echo '<td colspan="' . $colspan . '"><span>No Results Found!</span></td>';
-        echo '</tr>';
-    } else {
-        foreach ($data as $record) {
-            if ($table == 'teams') {
-                printRow($record);
-            } elseif ($table == 'employees') {
-                printRowEmployee($record, $teams);
-            }
-        }
+    else {
+        echo '<i class="fa fa-caret-down"></i>';
     }
 }
 
@@ -127,50 +101,6 @@ function setValue($field)
         echo 'value=""';
     } else {
         echo 'value="' . old($field) . '"';
-    }
-}
-
-/**
- * Print each row of result
- * @param $record
- * @return void
- */
-function printRow($record)
-{
-    echo '<tr>';
-    foreach ($record->toArray() as $key) {
-        echo '<td>' . $key . '</td>';
-    }
-    echo '<td class="col-2">';
-    echo '<div class="btn-container">';
-    echo '<div class="col-auto">';
-    echo '<a class="btn btn-dark" href="' . setHrefTeam('edit', $record['id']) . '">EDIT</a>';
-    echo '</div>';
-    echo '<div class="col-auto">';
-    echo "<a  class=\"btn btn-danger\"
-              href=\"" . setHrefTeam('delete', $record['id']) . "\"
-                  type=\"button\"  data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\"'
-            >DELETE</a>";
-    echo '</div>';
-    echo '</div>';
-    echo '</td>';
-    echo '</tr>';
-}
-
-/**
- * SET button type and target id -> Return a route redirect
- * @param $buttonType
- * @param $id
- * @return string|void
- */
-function setHrefTeam($buttonType, $id)
-{
-
-    if ($buttonType == 'edit') {
-        return route('team.editTeam', ['id' => $id]);
-    }
-    if ($buttonType == 'delete') {
-        return route('team.delete', ['id' => $id]);
     }
 }
 
@@ -257,71 +187,6 @@ function handleAvatar()
 
 //-------------------------------------VIEWS HELPERS
 //---------------------------------SEARCH
-/**
- * Print each row of result for employee
- * @param $record
- * @return void
- */
-function printRowEmployee($record, $teams = [])
-{
-    $handledRecord = handleEmployeeRecord($record, $teams);
-    echo '<tr>';
-    foreach ($handledRecord as $key => $value) {
-        if ($key == 'avatar') {
-            echo '<td><img src="' . asset($value) . '"></td>';
-        } else {
-            echo '<td>' . $value . '</td>';
-        }
-    }
-    echo '<td class="col-2">';
-    echo '<div class="btn-container">';
-    echo '<div class="col-auto">';
-    echo '<a class="btn btn-dark" href="' . setHrefEmployee('edit', $record['id']) . '">EDIT</a>';
-    echo '</div>';
-    echo '<div class="col-auto">';
-    echo "<a  class=\"btn btn-danger\"
-              href=\"" . setHrefEmployee('delete', $record['id']) . "\"
-              onclick=\"return confirm('Are you sure to delete this?')\"
-            >DELETE</a>";
-    echo '</div>';
-    echo '</div>';
-    echo '</td>';
-    echo '</tr>';
-}
-
-/**
- * Handling data of an employee before printing it out
- * @param $record
- * @param $teams
- * @return array
- */
-function handleEmployeeRecord($record, $teams = [])
-{
-    $handleRecord = [];
-    $handleRecord['id'] = $record['id'];
-    $handleRecord['avatar'] = $record['avatar'];
-    $handleRecord['team_id'] = setTeamNameByID($record['team_id'], $teams);
-    $handleRecord['name'] = $record['last_name'] . ' ' . $record['first_name'];
-    $handleRecord['email'] = $record['email'];
-
-    return $handleRecord;
-}
-
-/**
- * SET button type and target id -> Return a route redirect
- * @param $buttonType
- * @param $id
- * @return string|void
- */
-function setHrefEmployee($buttonType, $id)
-{
-    if ($buttonType == 'edit') {
-        return route('employee.editEmployee', ['id' => $id]);
-    }
-    if ($buttonType == 'delete') {
-        return route('employee.delete', ['id' => $id]);
-    }
-}
 
 /**
  * @param $selectedColumn -> the column that is about to be clicked
@@ -571,6 +436,10 @@ function setDate($date)
     return $correctDate;
 }
 
+/**
+ * @param $data
+ * @return mixed
+ */
 function correctingInputForEdit($data)
 {
     if (request()->hasFile('avatar')) {

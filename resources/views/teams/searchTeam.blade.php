@@ -35,10 +35,10 @@
                 <div class="input-form-box">
                     <!-- Name input -->
                     <div class="row g-2 align-items-center mb-3 mt-3">
-                        <div class="col-2 m-3">
+                        <div class="col-2">
                             <label for="name" class="col-form-label">Name</label>
                         </div>
-                        <div class="col-6 m-3">
+                        <div class="col-9">
                             <input type="text"
                                    maxlength="128"
                                    id="name"
@@ -48,8 +48,8 @@
                             />
                         </div>
                         @if($errors->has('name'))
-                            <div class="col-4"></div>
-                            <div class="col-8">
+                            <div class="col-2"></div>
+                            <div class="col-9">
                              <span class="err-span no-mg-top">
                                 @error('name')
                                  {{ $message }}
@@ -90,20 +90,23 @@
                     <thead class="thead-dark">
                     <tr>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefTeam('id',$column??'id',$direction??'desc')}}">
-                                ID {{showSortingArrow('id', $column??'id', $direction??'desc', $teams)}}
-                            </a>
+                            @if($teams->toArray()['total'] > 0)
+                                <a href="{{setSortHrefTeam('id',$column??'id',$direction??'desc')}}"> @endif
+                                    ID @if($teams->toArray()['total'] > 0){{showSortingArrow('id', $column??'id', $direction??'desc', $teams)}}
+                                </a>
+                            @endif
                         </th>
                         <th class="thread-column" scope="col">
-                            <a href="{{setSortHrefTeam('name',$column??'id',$direction??'desc')}}">
-                                Name {{showSortingArrow('name', $column??'id', $direction??'desc', $teams)}}
-                            </a>
+                            @if($teams->toArray()['total'] > 0)
+                            <a href="{{setSortHrefTeam('name',$column??'id',$direction??'desc')}}"> @endif
+                                Name  @if($teams->toArray()['total'] > 0) {{showSortingArrow('name', $column??'id', $direction??'desc', $teams)}}
+                            </a> @endif
                         </th>
                         <th scope="col">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    @if(!empty($teams))
+                    @if($teams->toArray()['total'] > 0)
                         @foreach($teams as $team)
                             <tr>
                                 <td>{{ $team->id }}</td>
@@ -130,12 +133,4 @@
             </div>
         </div>
     </div>
-    <script>
-        // var myModal = document.getElementById('myModal')
-        // var myInput = document.getElementById('myInput')
-        //
-        // myModal.addEventListener('shown.bs.modal', function () {
-        //     myInput.focus()
-        // })
-    </script>
 @endsection
