@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class LoginController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return view('auth.index');
     }
 
@@ -23,9 +24,9 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request): \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        $credentials = $request->only('email','password');
-        if (Auth::attempt($credentials)){
-            session()->put('admin',true);
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            session()->put('admin', true);
             writeLog('Logged in at');
             return redirect(route('team.searchTeam'));
         }
@@ -44,9 +45,8 @@ class LoginController extends Controller
         $data = $request->all();
         $check = $this->create($data);
 
-        $credentials = $request->only('email','password');
-        if(Auth::attempt($credentials))
-        {
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
             writeLog('Logged in at');
             session()->put('admin', true);
             return redirect(route('team.searchTeam'));
@@ -65,7 +65,8 @@ class LoginController extends Controller
         ]);
     }
 
-    public function logOut() {
+    public function logOut()
+    {
         Storage::deleteDirectory('public/temp');
         Session::flush();
         Auth::logout();

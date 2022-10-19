@@ -4,17 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateEmployeeRequest;
 use App\Http\Requests\EditEmployeeRequest;
-use App\Http\Requests\EditTeamRequest;
 use App\Jobs\SendEmail;
 use App\Repositories\Employees\EmloyeesRepository;
 use App\Repositories\Employees\EmployeesRepositoryInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use PHPUnit\Exception;
@@ -40,7 +36,7 @@ class EmployeesController extends Controller
     //-------------------------------------------VIEWS------------------------------------------------------------------
     public function searchEmployee(): Factory|View|Application
     {
-        if(Session::has('tempImgUrl')){
+        if (Session::has('tempImgUrl')) {
             Session::forget('tempImgUrl');
         }
         $employees = $this->employeesRepo->findAll();
@@ -53,11 +49,11 @@ class EmployeesController extends Controller
 
     public function createEmployee(): Factory|View|Application
     {
-        if(request()->has('reset')){
+        if (request()->has('reset')) {
             Session::forget('tempImgUrl');
         }
         $previous = Session::get('_previous')['url'];
-        if(str_contains($previous, 'search')){
+        if (str_contains($previous, 'search')) {
             Session::forget('_old_input');
         }
         return view('employees/createEmployee', ['teams' => $this->teams, 'positionList' => $this->positionList, 'typeOfWork' => $this->typeOfWork]);
@@ -74,9 +70,9 @@ class EmployeesController extends Controller
 
     public function editEmployee(int $id)
     {
-       if(request()->has('reset')){
-           Session::forget('tempImgUrl');
-       }
+        if (request()->has('reset')) {
+            Session::forget('tempImgUrl');
+        }
 
         $find = $this->employeesRepo->find($id);
         $target = $find->toArray();
@@ -148,7 +144,7 @@ class EmployeesController extends Controller
         SendEmail::dispatch($message, $employeeEmail);
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
-        writeLog('Create Employee at Email '.$data['email']);
+        writeLog('Create Employee at Email ' . $data['email']);
         return Redirect::route('employee.searchEmployee');
     }
 
@@ -186,7 +182,7 @@ class EmployeesController extends Controller
         Session::forget('lastSearchUrl');
 
         Session::flash('message', config('messages.UPDATE_SUCCESS'));
-        writeLog('Update Employee at ID '.$data['id']);
+        writeLog('Update Employee at ID ' . $data['id']);
         return Redirect()->to($rediectDestination);
     }
 
@@ -242,7 +238,7 @@ class EmployeesController extends Controller
             return redirect(route('employee.searchEmployee'));
         }
 
-        writeLog('Delete Employee at ID '.$id);
+        writeLog('Delete Employee at ID ' . $id);
         Session::flash('message', config('messages.DELETE_SUCCESS'));
         return Redirect::route('employee.searchEmployee');
     }

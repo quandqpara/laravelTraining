@@ -14,4 +14,6 @@ return [
     'DEFAULT_EXPORT_FILE_PATH' => public_path().'/export.csv',
 
     'NO_TEAM_EMPLOYEE' => '-Currently in No Team-',
+
+    'NO_PERMISSION' => 'You are not allow to access this page',
 ];

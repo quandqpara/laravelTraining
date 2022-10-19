@@ -17,7 +17,7 @@ class CreateEmployeeRequest extends FormRequest
         handleAvatar();
         request()->flash();
         if (!session()->has('admin')) {
-            return redirect('auth')->with('success', 'You are not allow to access this page.');
+            return redirect('auth');
         }
         return true;
     }

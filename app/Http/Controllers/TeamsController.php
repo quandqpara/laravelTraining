@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DestroyTeamRequest;
-use App\Models\Teams;
 use App\Http\Requests\CreateTeamRequest;
 use App\Http\Requests\EditTeamRequest;
 use App\Http\Requests\SearchTeamRequest;
@@ -15,10 +14,8 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Auth;
 
 class TeamsController extends Controller
 {
@@ -48,7 +45,7 @@ class TeamsController extends Controller
 
     public function createTeam()
     {
-        if(!str_contains(Session('_previous')['url'], 'create') && Session('_old_input') !== null){
+        if (!str_contains(Session('_previous')['url'], 'create') && Session('_old_input') !== null) {
             Session::forget('_old_input');
         }
         return view('teams/createTeam');
@@ -66,14 +63,14 @@ class TeamsController extends Controller
     public function editTeam(int $id)
     {
 
-        if(str_contains($this->previousPage, 'search') && Session('_old_input') !== null){
+        if (str_contains($this->previousPage, 'search') && Session('_old_input') !== null) {
             Session::forget('_old_input');
         }
 
         $find = $this->teamsRepo->find($id);
         $target = $find->toArray();
 
-        if(empty($target['0'])){
+        if (empty($target['0'])) {
             Session::flash('message', config('global.TARGET_NOT_FOUND'));
             return view(route('team.searchTeam'));
         }
@@ -84,7 +81,7 @@ class TeamsController extends Controller
     {
         $data = $request->all();
         $request->flash();
-        if(empty($data)){
+        if (empty($data)) {
             Session::flash('message', config('global.TARGET_NOT_FOUND'));
             return view(route('team.searchTeam'));
         }
@@ -112,8 +109,8 @@ class TeamsController extends Controller
         try {
             $this->teamsRepo->create($data);
         } catch (Exception $e) {
-           handleExceptionMessage($e);
-           return redirect(route('team.createTeam'));
+            handleExceptionMessage($e);
+            return redirect(route('team.createTeam'));
         }
 
         //2
@@ -123,7 +120,7 @@ class TeamsController extends Controller
         }
 
         Session::flash('message', config('messages.CREATE_SUCCESS'));
-        writeLog('Create Team '.$data['name']);
+        writeLog('Create Team ' . $data['name']);
         return Redirect::route('team.searchTeam');
     }
 
@@ -151,12 +148,12 @@ class TeamsController extends Controller
             return redirect(route('team.editTeam', ['id' => $data['id']]));
         }
 
-        $rediectDestination = Session::get('lastSearchUrl');
+        $redirectDestination = Session::get('lastSearchUrl');
         Session::forget('lastSearchUrl');
 
         Session::flash('message', config('messages.UPDATE_SUCCESS'));
-        writeLog('Update Team at ID '.$data['id']);
-        return Redirect()->to($rediectDestination);
+        writeLog('Update Team at ID ' . $data['id']);
+        return Redirect()->to($redirectDestination);
     }
 
     /**
@@ -183,7 +180,7 @@ class TeamsController extends Controller
      */
     public function destroy($id)
     {
-        try{
+        try {
             $result = $this->teamsRepo->delete($id);
         } catch (Exception $e) {
             handleExceptionMessage($e);
@@ -195,7 +192,7 @@ class TeamsController extends Controller
             return redirect(route('team.searchTeam'));
         }
 
-        writeLog('Delete Team at ID '.$id);
+        writeLog('Delete Team at ID ' . $id);
         Session::flash('message', config('messages.DELETE_SUCCESS'));
         return Redirect::route('team.searchTeam');
     }

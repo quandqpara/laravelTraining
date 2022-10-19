@@ -15,8 +15,7 @@ class EditTeamRequest extends FormRequest
     {
         request()->flash();
         if (!session()->has('admin')) {
-            return redirect('auth')->with('success', 'You are not allow to access this page.');
-            return false;
+            return redirect('auth');
         }
         return true;
     }
@@ -30,7 +29,7 @@ class EditTeamRequest extends FormRequest
     {
         return [
             'id' => 'required',
-            'name' => 'required|string|min:4|max:64|unique:teams,name,'.request()->get('id'),
+            'name' => 'required|string|min:4|max:64|unique:teams,name,' . request()->get('id'),
         ];
     }
 }
